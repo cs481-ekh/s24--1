@@ -1,2 +1,6 @@
 #!/bin/bash
-exit 127
+
+# Important: test files must be formatted `test_*.py`
+
+# Run tests using pytest
+pytest
