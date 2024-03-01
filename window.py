@@ -7,6 +7,7 @@ from wx import *
 appTitle = 'Descent 2.0'
 
 class MyFrame(wx.Frame):
+    # Runs automatically, initializes application opbject
     def __init__(self, parent, id, title):
         wx.Frame.__init__(self, parent, id, title, wx.Point(-1,-1), wx.Size(608,465), style = wx.MINIMIZE_BOX|wx.SYSTEM_MENU|wx.CAPTION|wx.CLOSE_BOX & ~ wx.RESIZE_BORDER)
         
@@ -14,7 +15,7 @@ class MyFrame(wx.Frame):
         self.SetStatusText("")
         self.SetTitle(title)
 
-        # Menu ID numbers
+        # Menu ID numbers for Events
         self.ID_ABOUT   = 101
         self.ID_EXIT    = 102
         self.ID_OPEN    = 103
@@ -28,33 +29,33 @@ class MyFrame(wx.Frame):
         self.ID_RELOAD = 112
         self.ID_EXPORTGMATRIX = 113
         self.ID_EXPORTKINDEMCOM = 114
-        #self.ID_SCATTER = 115
-        #self.ID_HIST = 116
-        #self.ID_BOX = 117
+
+        ####################
+        ## Menu Bar Setup ##
+        ####################
 
         # Set up file menu
         self.fileMenu = wx.Menu()
-        #self.fileMenu.Append(self.ID_ABOUT, "&About", "More information about this program")
-        #self.fileMenu.AppendSeparator()
         self.fileMenu.Append(self.ID_OPEN, "&Open...\tCtrl-O", "Open a tab-delimited data file")
         self.fileMenu.Append(self.ID_SAVE, "&Save\tCtrl-S", "Save the current data file in tab-delimited format")
         self.fileMenu.Append(self.ID_SAVEAS, "Sa&ve as...", "Save the current data in a new file in tab-delimited format")
         self.fileMenu.Append(self.ID_KINDEMCOM, "&Import KINDEMCOM...", "Import KINDEMCOM Ego File")
         self.fileMenu.Append(self.ID_EXIT, "E&xit\tCtrl-Q", "Terminate the program")
-        #self.fileMenu.Append(self.ID_RELOAD, "R&eload\tCtrl-R", "Reload help")
         
         # Disable file menu items that require an open file
         self.fileMenu.Enable(self.ID_SAVE, 0)
         self.fileMenu.Enable(self.ID_SAVEAS, 0)
         
+
         # Set up edit menu
         self.editMenu = wx.Menu()
         self.editMenu.Append(self.ID_COPY, "&Copy\tCtrl-C", "Copy selection")
-        # self.editMenu.Append(self.ID_PASTE, "&Paste\tCtrl-V", "Paste") # Disable 'paste' because too much hassle to implement
-        # Disable edit menu items that require a selection
-        #self.editMenu.Enable(self.ID_COPY, 0)
-        #self.editMenu.Enable(self.ID_PASTE, 0)
+        # self.editMenu.Append(self.ID_PASTE, "&Paste\tCtrl-V", "Paste") # Disabled 'paste' because too much hassle to implement
         
+        # Disable edit menu items that require a selection
+        self.editMenu.Enable(self.ID_COPY, 0)
+        
+
         # Set up export menu
         self.exportMenu = wx.Menu()
         self.exportMenu.Append(self.ID_EXPORT, "Export results...", "Export results to a tab-delimited file")
@@ -67,18 +68,8 @@ class MyFrame(wx.Frame):
         self.exportMenu.Enable(self.ID_EXPORTGMATRIX, 0)
         self.exportMenu.Enable(self.ID_EXPORTKINDEMCOM, 0)
 
-        # Set up plot menu
-        #self.plotMenu = wx.Menu()
-        #self.plotMenu.Append(self.ID_SCATTER, "Scatter plot", "Plot a scatterplot", wx.ITEM_RADIO)
-        #self.plotMenu.Append(self.ID_HIST, "Histogram", "Plot a histogram", wx.ITEM_RADIO)
-        #self.plotMenu.Append(self.ID_BOX, "Boxplot", "Plot a boxplot", wx.ITEM_RADIO)
-        # Disable items until Plot tab is opened
-        #self.plotMenu.Enable(self.ID_SCATTER, 0)
-        #self.plotMenu.Enable(self.ID_HIST, 0)
         
-        # Set up Sort menu
-        #self.sortMenu = wx.Menu()
-        
+        # Set up Sort menu        
         self.menuBar = wx.MenuBar()
         self.menuBar.Append(self.fileMenu, "&File")
         self.menuBar.Append(self.editMenu, "&Edit")
@@ -87,42 +78,48 @@ class MyFrame(wx.Frame):
         #self.menuBar.Append(self.sortMenu, "S&ort")
         self.SetMenuBar(self.menuBar)
 
+        # TODO: There is something wrong here. The Syntax is old and deprecated!
+        # Something like this might work: self.Bind(wx.EVT_MENU, self.OnOpen, self.ID_OPEN)
         """ #wx.EVT_MENU(self, self.ID_ABOUT, self.OnAbout)
-        self.Bind(wx.EVT_MENU, self.OnOpen, self.ID_OPEN)
-        wx.Bind(self, self.ID_SAVE, self.OnSave)
-        wx.Bind(self, self.ID_SAVEAS, self.OnSaveAs)
-        wx.Bind(self, self.ID_KINDEMCOM, self.OnImport)
-        wx.Bind(self, self.ID_EXPORT, self.OnExport)
-        wx.Bind(self, self.ID_EXPORTRMATRIX, self.OnExportMatrix)
-        wx.Bind(self, self.ID_EXPORTGMATRIX, self.OnExportMatrix)
-        wx.Bind(self, self.ID_EXPORTKINDEMCOM, self.OnExportKINDEMCOM)
-        wx.Bind(self, self.ID_COPY, self.OnCopy)
-        wx.Bind(self, self.ID_EXIT, self.TimeToQuit)
+        wx.EVT_MENU(self, self.ID_OPEN, self.OnOpen)
+        wx.EVT_MENU(self, self.ID_SAVE, self.OnSave)
+        wx.EVT_MENU(self, self.ID_SAVEAS, self.OnSaveAs)
+        wx.EVT_MENU(self, self.ID_KINDEMCOM, self.OnImport)
+        wx.EVT_MENU(self, self.ID_EXPORT, self.OnExport)
+        wx.EVT_MENU(self, self.ID_EXPORTRMATRIX, self.OnExportMatrix)
+        wx.EVT_MENU(self, self.ID_EXPORTGMATRIX, self.OnExportMatrix)
+        wx.EVT_MENU(self, self.ID_EXPORTKINDEMCOM, self.OnExportKINDEMCOM)
+        wx.EVT_MENU(self, self.ID_COPY, self.OnCopy)
+        wx.EVT_MENU(self, self.ID_EXIT, self.TimeToQuit)
         #wx.EVT_MENU(self, self.ID_SCATTER, self.SetPlot)
         #wx.EVT_MENU(self, self.ID_HIST, self.SetPlot)
         #wx.EVT_MENU(self, self.ID_BOX, self.SetPlot)
         #wx.EVT_MENU(self, self.ID_RELOAD, self.Reload) """
         
-        # Disable Plot menu to start with.
-        #self.menuBar.EnableTop(3, 0)
         self.CreateNotebook()        
-        
+    
+    # Builds global tabs
     def CreateNotebook(self):
         # Create notebook for frame with help panel showing
         self.notebook=Notebook(self, -1, wx.Point(0,0), wx.Size(602,400))
         wx.EVT_NOTEBOOK_PAGE_CHANGED(self, self.notebook.GetId(), self.OnPageChanged)
         # self.notebook.AddPage(HelpPanel(self), "Help")
 
+    # Currently Disconnected
     def ErrorDialog(self, warning, title='Error'):
         dlg = wx.MessageDialog(self, warning, title, wx.OK | wx.ICON_INFORMATION)
         dlg.ShowModal()
         dlg.Destroy()
-        
+    
+    # TODO
+    # Currently Disconnected
     def OnAbout(self, event):
         splashImage = wx.Image('splash.bmp', wx.BITMAP_TYPE_BMP).ConvertToBitmap()        
         splash = wx.SplashScreen(splashImage, wx.SPLASH_CENTRE_ON_PARENT|wx.SPLASH_NO_TIMEOUT,
           6000, NULL, -1, wx.DefaultPosition, wx.DefaultSize, wx.SIMPLE_BORDER|wx.STAY_ON_TOP)
-
+   
+    # TODO
+    # Currently Disconnected
     def OnOpen(self, event):
         dlg = wx.FileDialog(self)
         dlg.SetStyle(wx.OPEN)
@@ -130,7 +127,13 @@ class MyFrame(wx.Frame):
         if dlg.ShowModal() == wx.ID_OK: path = dlg.GetPath()
         dlg.Destroy()
         if path != '': self.OpenFile(path)
-            
+    
+        # TODO
+    
+        # TODO
+    
+    # TODO
+    # Currently Disconnected        
     def OpenFile(self, path):
         self.path = path
         self.SetTitle(appTitle + ' ' + __version__ +' '+path)
@@ -144,7 +147,9 @@ class MyFrame(wx.Frame):
             t = [str(j.strip()) for j in t] # Get rid of leading and trailing spaces, convert to ascii string
             data.append(t)
         self.PanelSetup(data)
-            
+
+    # TODO
+    # Currently Disconnected        
     def DetermineSepChar(self, d):
         "Determine the separation character of the data file."
         sepchars = ['\t', ',', ' ']; counts = {}
@@ -155,6 +160,8 @@ class MyFrame(wx.Frame):
             c = counts[i]
             if c[0] != 0 and c.count(c[0]) == len(c): return i
     
+    # TODO
+    # Currently Disconnected
     def PanelSetup(self, data=[]):
         "Set up notebook tabs."
         self.ClearPanels()
@@ -176,7 +183,9 @@ class MyFrame(wx.Frame):
         self.fileMenu.Enable(self.ID_SAVE, 1)
         self.fileMenu.Enable(self.ID_SAVEAS, 1)
         self.exportMenu.Enable(self.ID_EXPORTKINDEMCOM, 1)
-
+    
+    # TODO
+    # Currently Disconnected
     def writeTable(self, path, table, header=1):
         f = open(path, 'w')
         if header: # write out the column headings
@@ -192,7 +201,9 @@ class MyFrame(wx.Frame):
                 if (j == table.GetNumberCols()-1) and (i != table.GetNumberRows()-1): f.write('\n')
                 else: f.write('\t')
         f.close()
-        
+    
+    # TODO
+    # Currently Disconnected    
     def savePath(self):
         dlg = wx.FileDialog(self)
         dlg.SetStyle(wx.SAVE)
@@ -200,10 +211,14 @@ class MyFrame(wx.Frame):
         if dlg.ShowModal() == wx.ID_OK: path = dlg.GetPath()
         dlg.Destroy()
         return path
-            
+
+    # TODO
+    # Currently Disconnected        
     def OnSave(self, event):
         self.writeTable(self.path, self.notebook.Panel('Editor').table, self.notebook.Panel('Editor').header)
-
+    
+    # TODO
+    # Currently Disconnected
     def OnSaveAs(self, event):
         path = self.savePath()
         if path != '':
@@ -211,6 +226,8 @@ class MyFrame(wx.Frame):
             self.SetTitle(appTitle+': '+self.path)
             self.writeTable(self.path, self.notebook.Panel('Editor').table, self.notebook.Panel('Editor').header)
     
+    # TODO
+    # Currently Disconnected
     def OnImport(self, event):
         path = self.savePath()
         if path != '':
@@ -248,6 +265,8 @@ class MyFrame(wx.Frame):
             #self.editorPanel.table=Genealogy(self.data, sys.stdout)
             #self.grid = CustTableGrid(self.editorPanel, self.editorPanel.table, loc=[-1,-1], size=[430,345])            
     
+    # TODO
+    # Currently Disconnected
     def OnExport(self, event):
         page = self.notebook.GetSelection()
         panel = self.notebook.Panel(self.notebook.GetPageText(page))
@@ -256,6 +275,8 @@ class MyFrame(wx.Frame):
         #if path != '':
             #self.writeTable(path, panel.table)
 
+    # TODO
+    # Currently Disconnected
     def OnExportKINDEMCOM(self, event):
         # Export data file in KINDEMCOM format.  Only required fields are exported.
         # All other KINDEMCOM fields are filled in with 'missing' codes.
@@ -307,7 +328,9 @@ class MyFrame(wx.Frame):
             output.sort()
             for i in output: f.write(i)
             f.close()        
-        
+    
+    # TODO
+    # Currently Disconnected
     def OnExportMatrix(self, event):
         menuID = event.GetId()
         if menuID == self.ID_EXPORTRMATRIX:
@@ -330,31 +353,43 @@ class MyFrame(wx.Frame):
                         else: f.write('\t'); f.write(Matrix[i][j])
                     else: f.write('\t'); f.write('1') # write out r-value = 1 for matrix diagonal
         f.close()
-            
+    
+    # TODO
+    # Currently Disconnected
     def OnCopy(self, event):
         "Ask panel to copy whatever should be copied."
         page = self.notebook.GetPageText(self.notebook.GetSelection())
         panel = self.notebook.Panel(page)
         panel.Copy()
     
+    # TODO
+    # Currently Disconnected
     def SetPlot(self, event):
         "Set the plot type and tell plot panel to do what needs to be done"
         pass
     
+    # TODO
+    # Currently Disconnected
     def OnPageChanged(self, event):
         oldpage = event.GetOldSelection()
         newpage = event.GetSelection()
         # Tell newly opened panel that it is now open
         if oldpage != -1: self.notebook.GetPage(oldpage).OnDeactivate()
         self.notebook.GetPage(newpage).OnActivate()
-            
+    
+    # TODO
+    # Currently Disconnected
     def TimeToQuit(self, event):
         self.Close(True)
-
+    
+    # TODO
+    # Currently Disconnected
     def ClearPanels(self):
         self.notebook.Destroy()
         del self.notebook
-        
+
+    # TODO
+    # Currently Disconnected    
     def ProgressBar(self, size):
         if not hasattr(self, 'Bar'):
             self.Bar = wx.Gauge(self, -1, size, wx.Point(175, 150), wx.Size(250, 25))
@@ -365,15 +400,21 @@ class MyFrame(wx.Frame):
             elif size == -1:
                 self.Bar.Destroy()
                 del self.Bar
-        
+    
+    # TODO
+    # Currently Disconnected
     def Reload(self, event):
         # A debug function to reload and display HTML help file
         self.notebook.Panel('Help').html.LoadPage('help/index.html')
 
+    # TODO
+    # Currently Disconnected
     def timer(self, start, msg=''):
         if start == 1: self.startTime = time.clock()
         else: self.SetStatusText(msg + ': %5.1f seconds' % (time.clock() - self.startTime))
-        
+    
+    # TODO
+    # Currently Disconnected
     def Debug(self, path):
         self.OpenFile(path)
         app.frame.notebook.Panel('Editor').ToggleHeader()
@@ -384,7 +425,7 @@ class MyFrame(wx.Frame):
         app.frame.notebook.Panel('Editor').SexColumn.SetSelection(3)
         app.frame.notebook.Panel('Editor').LivingColumn.SetSelection(0)
 
-
+# Builds App and Window
 class MyApp(wx.App):
     def OnInit(self):
         self.frame = MyFrame(None, -1, appTitle)
@@ -394,9 +435,11 @@ class MyApp(wx.App):
 
 app = MyApp(0) # MyApp(1) redirects errors to program window
 
+# Simple Debugging from V1.0
 try:
     app.frame.Debug(sys.argv[1])
 except:
     pass
 
+# Sustains Window
 app.MainLoop()
