@@ -2,6 +2,7 @@
 # (Should Start from CLI and run window.py if GUI is chosen)
 
 import sys
+from window import *
 
 # Parameter flags
 gui_enable = False
@@ -16,3 +17,4 @@ print("", file=sys.stderr)
 
 if gui_enable:
     print(f"GUI flag enabled, starting GUI...", file=sys.stderr)
+    BuildApp()
