@@ -2,6 +2,7 @@
 # (Should Start from CLI and run window.py if GUI is chosen)
 
 import sys
+from window import *
 import os
 
 def print_usage():
@@ -55,3 +56,4 @@ for v in range(len(sys.argv)):
 
 if gui_enable:
     print(f"GUI flag enabled, starting GUI...", file=sys.stderr)
+    BuildApp()

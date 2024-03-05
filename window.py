@@ -433,13 +433,14 @@ class MyApp(wx.App):
         self.SetTopWindow(self.frame)
         return True
 
-app = MyApp(0) # MyApp(1) redirects errors to program window
+def BuildApp():
+    app = MyApp(0) # MyApp(1) redirects errors to program window
 
-# Simple Debugging from V1.0
-try:
-    app.frame.Debug(sys.argv[1])
-except:
-    pass
+    # Simple Debugging from V1.0
+    try:
+        app.frame.Debug(sys.argv[1])
+    except:
+        pass
 
-# Sustains Window
-app.MainLoop()
+    # Sustains Window
+    app.MainLoop()
