@@ -8,6 +8,7 @@ def print_usage():
     print(f"Descent is a genealogical analysis program that takes in files",file=sys.stdout)
     print(f"in the format of .csv and presents genealogical output.", file=sys.stdout)
 
+
 def print_details():
     print(f"TODO: The list of options for each flag would be listed here.", file=sys.stdout)
 
