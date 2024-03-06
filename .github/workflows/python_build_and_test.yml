@@ -21,6 +21,8 @@ jobs:
       
     - name: Install Dependencies
       run: |
+        sudo apt-get update
+        sudo apt-get install python-wxgtk3.0-dev
         pip install -r ./workflow/requirements.txt
 
     - name: Build
