@@ -2,7 +2,7 @@
 # (Should Start from CLI and run window.py if GUI is chosen)
 
 import sys
-from window import *
+from Descent import *
 import os
 
 def print_usage():
