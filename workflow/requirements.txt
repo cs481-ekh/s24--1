@@ -1,1 +1,1 @@
-wxPython
+wxPython==4.1.1 ; sys_platform == 'linux'
