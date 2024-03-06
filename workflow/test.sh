@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Install dependencies
-pip install -r ./workflow/requirements.txt
+#pip install -r ./workflow/requirements.txt
 
 # Important: test files must be formatted `test_*.py`
 
