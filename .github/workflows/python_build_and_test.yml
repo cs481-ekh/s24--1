@@ -26,7 +26,11 @@ jobs:
     - name: Install Python Dependencies
       run: |
         pip install -r ./workflow/requirements.txt
-
+        
+    - name: Test
+      run: |
+        chmod +x ./workflow/build.sh
+        bash ./workflow/build.sh
     - name: Test
       run: |
         chmod +x ./workflow/test.sh
