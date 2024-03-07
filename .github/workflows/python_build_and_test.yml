@@ -8,7 +8,7 @@ on:
 jobs:
   build_and_test:
     runs-on: ubuntu-latest
-    timeout-minutes: 1
+    timeout-minutes: 10
 
     steps:
     - name: Checkout code
@@ -26,8 +26,6 @@ jobs:
     - name: Install Python Dependencies
       run: |
         pip install -r ./workflow/requirements.txt
-
-
 
     - name: Test
       run: |
