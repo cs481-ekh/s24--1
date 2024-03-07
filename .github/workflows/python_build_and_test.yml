@@ -18,15 +18,16 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: '3.x'
+
+    - name: Install Ubuntu Dependencies
+      run:
+        sudo apt-get install libgtk-3-dev
       
-    - name: Install Dependencies
+    - name: Install Python Dependencies
       run: |
         pip install -r ./workflow/requirements.txt
 
-    - name: Build
-      run: |
-        chmod +x ./workflow/build.sh
-        bash ./workflow/build.sh
+
 
     - name: Test
       run: |
