@@ -2,7 +2,7 @@
 # (Should Start from CLI and run window.py if GUI is chosen)
 
 import sys
-from window import *
+from Descent import *
 import os
 
 def print_usage():
@@ -10,6 +10,7 @@ def print_usage():
     print(f"in the format of .csv and presents genealogical output.", file=sys.stdout)
 
 def print_details():
+    print_usage()
     print(f"TODO: The list of options for each flag would be listed here.", file=sys.stdout)
 
 def select_calc_option(str):
@@ -39,10 +40,10 @@ for v in range(len(sys.argv)):
             else:
                 print(f"{input_filename} could not be found and was not opened.", file=sys.stderr)
 
-    elif "--h" in sys.argv[v]:
-        print_usage()
     elif "--hf" in sys.argv[v]:
         print_details()
+    elif "--h" in sys.argv[v]:
+        print_usage()
     elif "--c" in sys.argv[v]:
         if len(sys.argv) >= v:
             print("--c flag requires a valid calculation option.", file=sys.stderr)

@@ -10,4 +10,5 @@ Descent is a statistical analysis software built in the early 2000's. Its purpos
 
 ## Running
 Run the following command in a terminal:
-`TODO`
+`main.py`
+Include flags as needed. `--hf` for a list of flags.

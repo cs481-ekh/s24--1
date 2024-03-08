@@ -6,8 +6,31 @@ on:
       - main
 
 jobs:
-  build_and_test:
+  build_and_test_windows:
+    runs-on: windows-latest
+    timeout-minutes: 10
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+      
+    - name: Install Python Dependencies
+      run: |
+        pip install -r ./workflow/requirements.txt
+        
+    - name: Build
+      run: |
+        chmod +x ./workflow/build.bat
+        bash ./workflow/build.bat
+
+  build_and_test_linux:
     runs-on: ubuntu-latest
+    timeout-minutes: 600
 
     steps:
     - name: Checkout code
@@ -18,12 +41,19 @@ jobs:
       with:
         python-version: '3.x'
 
+    - name: Install Ubuntu Dependencies
+      run:
+        sudo apt-get install libgtk-3-dev
+      
+    - name: Install Python Dependencies
+      run: |
+        pip install -r ./workflow/requirements.txt
+        
     - name: Build
       run: |
-        chmod +x build.sh
-        bash build.sh
-
+        chmod +x ./workflow/build.sh
+        bash ./workflow/build.sh
     - name: Test
       run: |
-        chmod +x test.sh
-        bash test.sh
+        chmod +x ./workflow/test.sh
+        bash ./workflow/test.sh
