@@ -250,14 +250,14 @@ class HelpPanel(Panel):
     def __init__(self, parent):
         super(HelpPanel, self).__init__(parent)
         self.html = html.HtmlWindow(self, -1, pos=(125, 1), size=(470, 373), style=wx.NO_FULL_REPAINT_ON_RESIZE)
-        self.html.LoadPage('help/index.html')
+        self.html.LoadPage('Assets/HelpPanel/index.html')
         self.choices = ['Splash', 'Introduction', 'Input file format', 'KINDEMCOM files', 'Error checking', 'Relatedness', 'Founders', 'Lineages', 'Counting kin', 'Kin', 'Groups', 'Plotting', 'PCA', 'Sorting', 'License', 'Change log', 'Bugs', 'Contact info', 'Acknowledgements']
         self.helpControl = wx.ListBox(self, 130, pos=(1, 1), size=(123, 373), choices=self.choices, style=wx.LB_NEEDED_SB)
         self.helpControl.Bind(wx.EVT_LISTBOX, self.OnHelpSelect)
 
     def OnHelpSelect(self, event):
         helpSection = self.choices[event.GetSelection()]
-        self.html.LoadPage('help/index.html#' + helpSection)
+        self.html.LoadPage('Assets/HelpPanel/index.html#' + helpSection)
 
     def EnableMenus(self):
         try:
