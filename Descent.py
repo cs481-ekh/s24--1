@@ -6,6 +6,7 @@ import wx.html as html
 appTitle = 'Descent'
 __version__ = "2.0"
 app = None
+path = None
 
 class MyFrame(wx.Frame):
     # Runs automatically, initializes application opbject
@@ -110,7 +111,7 @@ class MyFrame(wx.Frame):
     def OnAbout(self, event):
         splashImage = wx.Image('splash.bmp', wx.BITMAP_TYPE_BMP).ConvertToBitmap()        
         splash = wx.SplashScreen(splashImage, wx.SPLASH_CENTRE_ON_PARENT|wx.SPLASH_NO_TIMEOUT,
-          6000, NULL, -1, wx.DefaultPosition, wx.DefaultSize, wx.SIMPLE_BORDER|wx.STAY_ON_TOP)
+          6000, None, -1, wx.DefaultPosition, wx.DefaultSize, wx.SIMPLE_BORDER|wx.STAY_ON_TOP)
    
     # TODO
     # Currently Disconnected
@@ -156,7 +157,7 @@ class MyFrame(wx.Frame):
         self.notebook.Destroy()  # Clear existing panels
         self.CreateNotebook()
         
-        self.notebook.AddPage(EditorPanel(self.notebook, data), "Editor")
+        # self.notebook.AddPage(EditorPanel(self.notebook, data), "Editor")
         # TODO: Add other panels as needed
 
         self.fileMenu.Enable(self.ID_SAVE, 1)
