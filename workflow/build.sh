@@ -7,4 +7,4 @@ sudo apt-get install libgtk-3-dev
 #pip install -r ./workflow/requirements.txt
 
 # Run main.py
-python main.py
+python main.py --h

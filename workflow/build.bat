@@ -1,4 +1,4 @@
 @echo off
 echo Building...
 
-python main.py
+python main.py --h
