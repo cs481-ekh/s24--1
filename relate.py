@@ -16,7 +16,14 @@ from random import *
 #from orngMDS import *
 #import pyp_metrics, pyp_nrm
 
+ 
+# Object that connects the Input File Data to our App Object
+# Homemade (Not the Python Library DataMatrix)
+# TODO
+# Currently Disconnected   
 class dataMatrix:
+    # TODO
+    # Currently Disconnected   
     def __init__(self, data, app):
         self.data = data
         self.app = app
@@ -24,6 +31,10 @@ class dataMatrix:
         self.missing = self.fieldDef['missing']
         self.makeDict()
 
+    # Minor Data Validation and Formatting
+    # Focuses on just a few columns (Father, Mother, Sex, Living)
+    # TODO
+    # Currently Disconnected   
     def makeDict(self):
         # {Ego : [father, mother, sex, living], ...}
         self.dict ={}
@@ -34,12 +45,20 @@ class dataMatrix:
             else: mother=i[self.fieldDef['mother']]
             self.dict[i[self.fieldDef['ego']]]=[father,mother,i[self.fieldDef['sex']], i[self.fieldDef['living']]]
 
+    # Get method to find the index of an item
+    # TODO
+    # Currently Disconnected   
     def idMatrix(self, data):
         iMatrix={}
         for i in data.keys(): iMatrix[i]={}
         return iMatrix
-        
+
+# Core of ALL Functional Math
+# TODO
+# Currently Disconnected   
 class rMatrix(dataMatrix):
+    # TODO
+    # Currently Disconnected
     def __init__(self, data, app):
         dataMatrix.__init__(self, data, app)
         self.powersof2 = [2**i for i in range(50)]
@@ -47,7 +66,10 @@ class rMatrix(dataMatrix):
         self.dim = 0 # For MDS
         self.app = app
         self.PyPedalPedigree = self.app.frame.notebook.Panel('Editor').pedigree
-        
+
+    # Builds a relation tree around one individual
+    # TODO
+    # Currently Disconnected
     def Tree(self, ego):
         "Compiles a tree of ancestors for ego."
         # bigTree = {ego:[[path1, path2, path3, ...], [link1, link2, link3, ...]], ...}, where path1 = path of ids to ancestor 1
@@ -81,7 +103,10 @@ class rMatrix(dataMatrix):
             lastLinks = tempLinks
             if allMissing: break
         return [ancestors, links]
-        
+
+    # Creates a path between two egos
+    # TODO
+    # Currently Disconnected   
     def PathFinder(self, treeA, treeB):
         "Find all paths between two egos."
         pathsA = []; pathsB = [] # Paths terminating in a common ancestor will be stored here.
@@ -99,7 +124,10 @@ class rMatrix(dataMatrix):
                     LinksB += [treeB[1][j]]
         for i in pathsA: commonAncestors += [i[-1]]
         return (pathsA, LinksA, pathsB, LinksB, commonAncestors)
-    
+
+    # Finds alter egos of ego
+    # TODO
+    # Currently Disconnected   
     def AlterEgos(self, ego, kinOnly):
         "Find alter egos of ego; list relationship and relatedness.  Must call relatedness before calling AlterEgos."
         treeA = self.Tree(ego)
@@ -120,7 +148,11 @@ class rMatrix(dataMatrix):
             elif not kinOnly: kin.append([alterego, r, ''])
         if len(kin) == 1: kin += [['','','']] # Hack. Add an empty dummy row if there are no alteregos so table routines don't choke.
         return kin
-        
+
+    # Defines the type of connection between two egos
+    # Female = Daughter, Male = Son
+    # TODO
+    # Currently Disconnected   
     def formatConnection(self, connection, link, alterego):
         mapping = {'F':'S', 'M':'D'}
         kin = connection[0]
@@ -130,6 +162,10 @@ class rMatrix(dataMatrix):
             else: kin = kin + 'D'
         return kin    
 
+    # Calculates each Ego's Global Relatedness
+    # Possibly never used (There is a newer copy of this method)
+    # TODO
+    # Currently Disconnected   
     def relatednessOLD(self):
         # Loop to calculate everyones r with everyone else
         #self.makeDict()
@@ -181,6 +217,10 @@ class rMatrix(dataMatrix):
             self.app.frame.ProgressBar(a) # Call back to update progress bar
         self.app.frame.ProgressBar(-1) # Call back to delete progress bar
 
+    # Builds an Ancestor Tree
+    # Does not take an ego as param unlike Tree()
+    # TODO
+    # Currently Disconnected
     def ancestorTree(self):
         # bigTree = {ego:[[path1, path2, path3, ...], [link1, link2, link3, ...]], ...}, where path1 = path of ids to ancestor 1
         # and link1 = relationship links to ancestor 1 (e.g., FFDS).
@@ -215,7 +255,10 @@ class rMatrix(dataMatrix):
                 lastLinks = tempLinks
                 if allMissing: break
             self.bigTree[i] = [ancestors, links]
-    
+
+    # Finds Population Ancestors and Descendants
+    # TODO
+    # Currently Disconnected
     def findFounders(self, count):
         "Find population ancestors and their descendants."
         # Find founders
@@ -265,7 +308,11 @@ class rMatrix(dataMatrix):
                 founderTable += [[f, temp1[1:], temp2[1:]]]
 
         return founderTable
-    
+
+    # Used to help find Founders
+    # Finds Descendants of an Ego
+    # TODO
+    # Currently Disconnected
     def findDescendants(self, ego):
         "Find all descendants of egos."
         descendants = set([]) # There may be multiple paths to a descendant, but descendants are unique!
@@ -282,7 +329,11 @@ class rMatrix(dataMatrix):
             descendants.update(offspring)
             temp = offspring
         return descendants
-        
+
+    # Simple Getter Method
+    # Returns T/F if Ego is living
+    # TODO
+    # Currently Disconnected
     def findLiving(self, egos):
         if self.fieldDef['allAlive']: return egos
         else:
@@ -290,15 +341,26 @@ class rMatrix(dataMatrix):
             for e in egos:
                 if self.dict[e][3] == self.fieldDef['alive']: living += [e]
         return living
-    
+
+    # New Method to find Relatedness of each Ego to Population
+    # Uses PyPedal Library File pyp_metrics
+    # TODO
+    # Currently Disconnected
     def relatedness(self):
         "Compute relatedness matrix using PyPedal. Wrap matrix to interface with Descent."
         self.pedigree = self.app.frame.notebook.Panel('Editor').pedigree.pedigree.pedigree
         self.a, self.f_avg, self.fnz_avg, self.r_avg, self.rnz_avg = pyp_metrics.fast_a_coefficients(self.pedigree)
-        
+
+    # Unknown what this does
+    # TODO
+    # Currently Disconnected
     def rMatrix(self, id1, id2):
         return self.a[self.PyPedalPedigree.rIndex[id1], self.PyPedalPedigree.rIndex[id2]]
-    
+
+    # Calculates FgALL (From PyPedal) and Inbreeding Coefficients
+    # Uses PyPedal Library
+    # TODO
+    # Currently Disconnected
     def FgALL(self):
         # Calculates FgALL and inbreeding coefficients using PyPedal
         table=[['Ego','FgALL', 'FgCON', '# of relatives', 'inbreeding']]
@@ -329,7 +391,12 @@ class rMatrix(dataMatrix):
         theKeys.sort()
         for i in theKeys: table.append([i, pypedalfgall[i], pypedalfgcon[i], pypedalrelatives[i], pypedalinbreeding[i]])
         return table
-    
+
+    # Older Version of FgALL
+    # Possibly Not Used
+    # Calculates the same things
+    # TODO
+    # Currently Disconnected
     def FgALL_OLD(self):
         # Calculates FgALL, FgCON, and inbreeding coefficient
         #average=[['Ego','FgALL', 'FgCON', '# relatives', 'inbreeding']]
@@ -387,6 +454,9 @@ class rMatrix(dataMatrix):
             #average.append([i, FgALL, FgCON, sizeCON, inbreedingCoeff])
         return average
 
+    # Converts 'array' of relatedness values into Numeric Array
+    # TODO
+    # Currently Disconnected
     def idMatrix2Array(self, d):
         # Helper function to convert the dictionary 'array' of relatedness values to a Numeric array
         self.IDS = d.keys(); self.IDS.sort()
@@ -396,7 +466,11 @@ class rMatrix(dataMatrix):
             for j in range(n):
                 if i != j: array[i, j] = d[self.IDS[i]][self.IDS[j]]
         return array
-        
+
+    # Performs Principal Component Analyses (PCA)
+    # Sort eigenvectors and eigenvalues
+    # TODO
+    # Currently Disconnected
     def PCA2(self):
         "Perform PCA on rMatrix, sort eigenvectors and eigenvalues"
         if hasattr(self, 'evals'): return # Don't re-compute PCA
@@ -410,22 +484,36 @@ class rMatrix(dataMatrix):
         order = (Numeric.argsort(self.evals)[::-1])
         self.evecs = Numeric.take(self.evecs, order, 1)
         self.evals = Numeric.take(self.evals, order)
-    
+
+    # Data Formatting for after PCA's
+    # TODO
+    # Currently Disconnected
     def PCAPlot2(self, dim):
         featureVector = Numeric.transpose(Numeric.take(self.evecs, range(dim), 1)).astype(Numeric.Float) # Take first 'dim' eigenvectors and transpose
         return Numeric.transpose(Numeric.matrixmultiply(featureVector, Numeric.transpose(self.M)))
 
+    # Performs Principal Component Analyses (PCA)
+    # TODO
+    # Currently Disconnected
     def PCA(self):
         if hasattr(self, 'evals'): return # Don't re-compute PCA
         self.M = self.a #self.idMatrix2Array(self.rMatrix)
         self.M = self.M - mean(self.M)
         self.u, self.evals, v = svd(self.M)
-    
+
+    # Data Formatting for after PCA's
+    # Puts data into a matrix
+    # TODO
+    # Currently Disconnected
     def PCAPlot(self, dim):
         #print 'v: ', self.v[:,:dim]
         #print 'u: ', self.u[:,:dim]
         return matrixmultiply(transpose(self.M), self.u[:,:dim])
-        
+
+    # Unknown waht MDS is
+    # Seems to do more data processing
+    # TODO
+    # Currently Disconnected
     def MDS(self, dim):
         if hasattr(self, 'mds') and self.dim==dim: return # Don't re-compute MDS for same dim
         self.dim = dim
@@ -434,14 +522,23 @@ class rMatrix(dataMatrix):
         self.stress1 = self.mds.getStress()
         self.mds.Torgerson()
         self.stress2 = self.mds.getStress()
-        
+
+# Math specifically for the Groups Tab
+# Creates an Object which stores Group Data and allows for self-calling math methods
+# TODO
+# Currently Disconnected
 class Groups(dataMatrix):
+    # TODO
+    # Currently Disconnected
     def __init__(self, rMatrix, data, groupColumn, app):
         dataMatrix.__init__(self, data, app)
         self.fieldDef['group'] = groupColumn
         self.rMatrix = rMatrix
         self.makeGroupDict()
-        
+
+    # Creates a dictionary (list) of Ego ID's to build group
+    # TODO
+    # Currently Disconnected
     def makeGroupDict(self):
         "Make a dictionary of lists keyed by group ID's.  Each list contains group members."
         groupColumn = self.fieldDef['group']
@@ -468,7 +565,10 @@ class Groups(dataMatrix):
                 if groupID == '': groupID = self.fieldDef['missing']
                 if groupID not in self.groupDict: self.groupDict[groupID] = [i[egoColumn]]
                 else: self.groupDict[groupID].append(i[egoColumn])
-        
+
+    # Computes the Average Group Relatedness
+    # TODO
+    # Currently Disconnected
     def averageGroupRelatedness(self):
         "Within-group average relatedness."
         groupIDs = self.groupDict.keys()
@@ -482,6 +582,9 @@ class Groups(dataMatrix):
             else: groupAvg[i] = 1
         return groupAvg
     
+    # Computes the Average Between-Group Relatedness
+    # TODO
+    # Currently Disconnected
     def relatedness(self):
         "Average between-group relatedness."
         self.gMatrix = self.idMatrix(self.groupDict)
@@ -502,7 +605,11 @@ class Groups(dataMatrix):
                 self.gMatrix[groupIDs[j]][groupIDs[i]] = float(sum)/count
             self.app.frame.ProgressBar(i) # Call back to update progress bar
         self.app.frame.ProgressBar(-1) # Call back to delete progress bar                
-        
+
+    # Returns Statistics of the Group
+    # Group ID, Group Size, Avg. Relatedness
+    # TODO
+    # Currently Disconnected
     def stats(self):
         groupStats = [['Group ID', 'Group size', 'Avg. relatedness']]
         g = self.averageGroupRelatedness()
@@ -510,11 +617,21 @@ class Groups(dataMatrix):
         groupIDs.sort()
         for i in groupIDs: groupStats.append([i, len(self.groupDict[i]), g[i]])
         return groupStats
-    
+
+# Math specifically for the KinGroups Tab
+# Uses the dataMatrix Class to store data
+# TODO
+# Currently Disconnected
 class KinGroups(dataMatrix):
+    # Initializes the dataMatrix Object
+    # TODO
+    # Currently Disconnected
     def __init__(self, data, app):
         dataMatrix.__init__(self, data, app)
     
+    # Getter Method to return a List of Fathers from List of Egos
+    # TODO
+    # Currently Disconnected
     def fathers(self, idList):
         # idList is a list of lists of ego id's
         fatherIDsList=[]
@@ -528,6 +645,9 @@ class KinGroups(dataMatrix):
             fatherIDsList.append(fatherIDs)
         return fatherIDsList
     
+    # Getter Method to return a List of Mothers from List of Egos
+    # TODO
+    # Currently Disconnected
     def mothers(self, idList):
         motherIDsList=[]
         for ids in idList:
@@ -539,10 +659,16 @@ class KinGroups(dataMatrix):
                         motherIDs.append(self.dict[i][1])
             motherIDsList.append(motherIDs)
         return motherIDsList
-        
+    
+    # Getter Method to return a single List of Mothers and Fathers from List of Egos
+    # TODO
+    # Currently Disconnected
     def parents(self, idList):
         return self.zipLists(self.fathers(idList), self.mothers(idList))
-        
+    
+    # Getter Method to return a List of Sons from List of Egos
+    # TODO
+    # Currently Disconnected
     def sons(self, idList):
         sonsIDsList=[]
         for ids in idList:
@@ -557,6 +683,9 @@ class KinGroups(dataMatrix):
             sonsIDsList.append(sonIDs)
         return sonsIDsList
     
+    # Getter Method to return a List of Daughters from List of Egos
+    # TODO
+    # Currently Disconnected
     def daughters(self, idList):
         daughtersIDsList=[]
         for ids in idList:
@@ -571,12 +700,23 @@ class KinGroups(dataMatrix):
             daughtersIDsList.append(daugherIDs)
         return daughtersIDsList
 
+    # Getter Method to return a single List of Sons and Daughters from List of Egos
+    # TODO
+    # Currently Disconnected
     def offspring(self, idList):
         return self.zipLists(self.sons(idList), self.daughters(idList))
-        
+
+    # Nothing currently Here
+    # Would reutrn a single list of Father's Parents and Mother's Parents of each Ego in idList
+    # TODO
+    # Currently Disconnected
     def grandparents(self, idList):
         pass
     
+    # Getter Method to return a List of Brothers from List of Egos
+    # Does not use other methods
+    # TODO
+    # Currently Disconnected
     def brothers(self, idList):
         brothersIDsList=[]
         for ids in idList:
@@ -594,7 +734,11 @@ class KinGroups(dataMatrix):
                             if j not in brotherIDs: brotherIDs.append(j)
             brothersIDsList.append(brotherIDs)
         return brothersIDsList
-            
+
+    # Getter Method to return a List of Sisters from List of Egos
+    # Does not use other methods
+    # TODO
+    # Currently Disconnected
     def sisters(self, idList):
         sistersIDsList=[]
         for ids in idList:
@@ -612,10 +756,16 @@ class KinGroups(dataMatrix):
                             if j not in sisterIDs:sisterIDs.append(j)
             sistersIDsList.append(sisterIDs)
         return sistersIDsList
-        
+
+    # Getter Method to return a List of Full Siblings from List of Egos
+    # TODO
+    # Currently Disconnected
     def siblings(self, idList):
         return self.zipLists(self.brothers(idList), self.sisters(idList))
-        
+
+    # Getter Method to return a List of Half-Brothers from List of Egos
+    # TODO
+    # Currently Disconnected
     def halfbrothers(self, idList):
         halfbrothersIDsList=[]
         for ids in idList:
@@ -632,6 +782,9 @@ class KinGroups(dataMatrix):
             halfbrothersIDsList.append(brotherIDs)
         return halfbrothersIDsList
     
+    # Getter Method to return a List of Half-Sisters from List of Egos
+    # TODO
+    # Currently Disconnected
     def halfsisters(self, idList):
         halfsistersIDsList=[]
         for ids in idList:
@@ -647,10 +800,17 @@ class KinGroups(dataMatrix):
                         if j not in sisterIDs: sisterIDs.append(j)
             halfsistersIDsList.append(sisterIDs)
         return halfsistersIDsList
-        
+
+    # Getter Method to return a List of Half-Siblings from List of Egos
+    # TODO
+    # Currently Disconnected
     def halfsiblings(self, idList):
         return self.zipLists(self.halfbrothers(idList), self.halfsisters(idList))
-        
+
+    # Getter Method to return a List of Cousins from List of Egos
+    # Uses other methods
+    # TODO
+    # Currently Disconnected
     def cousins(self, idList):
         cousins = self.offspring(self.siblings(self.parents(idList)))
         # If there is sibling incest, ego can be own cousin; filter out egos from cousins in this case
@@ -661,6 +821,9 @@ class KinGroups(dataMatrix):
                 if j in ids: cousins[i].remove(j)
         return cousins
     
+    # Getter Method to return a List of Mates from List of Egos
+    # TODO
+    # Currently Disconnected
     def mates(self, idList):
         matesIDsList=[]
         for ids in idList:
@@ -676,6 +839,10 @@ class KinGroups(dataMatrix):
             matesIDsList.append(mates)
         return matesIDsList
 
+    # Getter Method to return a List of Step-Sons from List of Egos
+    # Uses other methdos
+    # TODO
+    # Currently Disconnected
     def stepsons(self, idList):
         # This could be done more efficiently, but what the hell.
         matesSons = self.sons(self.mates(idList))
@@ -687,6 +854,10 @@ class KinGroups(dataMatrix):
                 if j not in mySons[i] and j not in stepsonsIDsList[i]: stepsonsIDsList[i].append(j)
         return stepsonsIDsList
 
+    # Getter Method to return a List of Step-Daughters from List of Egos
+    # Uses other methdos
+    # TODO
+    # Currently Disconnected
     def stepdaughters(self, idList):
         matesDaughters = self.daughters(self.mates(idList))
         myDaughters = self.daughters(idList)
@@ -696,10 +867,18 @@ class KinGroups(dataMatrix):
             for j in matesDaughters[i]:
                 if j not in myDaughters[i] and j not in stepdaughtersIDsList[i]: stepdaughtersIDsList[i].append(j)
         return stepdaughtersIDsList
-        
+    
+    # Getter Method to return a List of Step-Children from List of Egos
+    # Uses other methdos
+    # TODO
+    # Currently Disconnected
     def stepchildren(self, idList):
         return self.zipLists(self.stepsons(idList), self.stepdaughters(idList))
-        
+
+    # Getter Method to return a List of Step-Brothers from List of Egos
+    # Uses other methdos
+    # TODO
+    # Currently Disconnected
     def stepbrothers(self, idList):
         allBrothers = self.sons(self.mates(self.parents(idList)))
         bloodBrothers = self.brothers(idList)
@@ -712,6 +891,10 @@ class KinGroups(dataMatrix):
                 if j not in bloodBrothers[i] and j not in halfbrothers[i] and j not in stepbrothersIDsList[i]: stepbrothersIDsList[i].append(j)
         return stepbrothersIDsList
 
+    # Getter Method to return a List of Step-Sisters from List of Egos
+    # Uses other methdos
+    # TODO
+    # Currently Disconnected
     def stepsisters(self, idList):
         allSisters = self.daughters(self.mates(self.parents(idList)))
         bloodSisters = self.sisters(idList)
@@ -723,15 +906,27 @@ class KinGroups(dataMatrix):
                 if j == idList[i]: continue # Don't add self to stepsisters
                 if j not in bloodSisters[i] and j not in halfsisters[i] and j not in stepsistersIDsList[i]: stepsistersIDsList[i].append(j)
         return stepsistersIDsList
-        
+
+    # Getter Method to return a List of Step-Siblings from List of Egos
+    # Uses other methdos
+    # TODO
+    # Currently Disconnected
     def stepsiblings(self, idList):
         return self.zipLists(self.stepbrothers(idList), self.stepsisters(idList))
     
+    # Custom method to combine 2 lists
+    # Keeps ordering intact so different families of Egos don't get mixed
+    # TODO
+    # Currently Disconnected
     def zipLists(self, list1, list2):
         zippedLists = []
         for i in range(len(list1)):zippedLists.append(list1[i]+list2[i])
         return zippedLists
-        
+
+    # Method to modulate which functions to run
+    # Calls actual methods based on 'fnc' parameter
+    # TODO
+    # Currently Disconnected
     def kinFunctionMap(self, fnc, idList):
         if   fnc=='fathers': return self.fathers(idList)
         elif fnc=='mothers': return self.mothers(idList)
@@ -757,6 +952,10 @@ class KinGroups(dataMatrix):
         elif fnc=='stepsiblings': return self.stepsiblings(idList)
         else: return []
 
+    # Method to run multiple functions with one call with a single Ego List
+    # Calls actual methods based on 'functionList' parameter
+    # TODO
+    # Currently Disconnected
     def kinFunctionExec(self, functionList, idList):
         kinLists=[]
         for fList in functionList:
@@ -766,6 +965,11 @@ class KinGroups(dataMatrix):
             kinLists.append(kin)
         return kinLists
 
+    # Method to run multiple functions with one call with a single Ego List
+    # Calls actual methods based on 'functionList' parameter
+    # Filters Results to exclude dead and parent's who aren't an Ego
+    # TODO
+    # Currently Disconnected
     def kinCount(self, count, functionList, allAlive = False):
         idList = self.dict.keys()
         idList.sort()
@@ -816,10 +1020,20 @@ class KinGroups(dataMatrix):
             matrix[i+1].append(temp[1:])
         return matrix
 
+# Math specifically for the Lineages Tab
+# Uses the dataMatrix Class to store data
+# TODO
+# Currently Disconnected
 class Lineages(dataMatrix):
+    # Initializes the dataMatrix Object
+    # TODO
+    # Currently Disconnected
     def __init__(self, data, app):
         dataMatrix.__init__(self, data, app)
     
+    # Returns a table tracing the lineage of all Egos in the dataMatrix object
+    # TODO
+    # Currently Disconnected
     def computeLineages(self):
         table = [['Ego', 'Patrilineage', 'Patriarch', 'Pat. size', 'Matrilineage', 'Matriarch', 'Mat. size']]
         ids = self.dict.keys()
@@ -830,7 +1044,10 @@ class Lineages(dataMatrix):
         for i in keys:
             table.append([i, egoPatrilineage[i], patriLineageSize[egoPatrilineage[i]][1], patriLineageSize[egoPatrilineage[i]][0], egoMatrilineage[i], matriLineageSize[egoMatrilineage[i]][1], matriLineageSize[egoMatrilineage[i]][0]])
         return table
-        
+
+    # Returns the upper leaf nodes of the lineage Tree
+    # TODO
+    # Currently Disconnected
     def lineageFounders(self, ids, lineageType):
         # Compute Patri- or Matrilineages
         if lineageType == 'patrilineage': code, sex = 0, 'male'
@@ -860,6 +1077,9 @@ class Lineages(dataMatrix):
             egoLineage[i] = ego
         return lineages, egoLineage, self.lineageStats(lineages, lineageType)
 
+    # Returns the stats of Lineage
+    # TODO
+    # Currently Disconnected
     def lineageStats(self, lineages, lineageType):
         # make new list of lineages omitting lineages with zero living members and those not belonging to any lineage
         lin = [lineages[x][0] for x in lineages if (lineages[x][0] != 0) and x != self.missing]
@@ -876,7 +1096,10 @@ class Lineages(dataMatrix):
         for i in lin: sum += i
         stats['Mean ' + lineageType + ' size'] = '%-5d' % round(float(sum)/len(lin))
         return stats
-        
+
+# Only used in Average Group Relatedness
+# TODO
+# Currently Disconnected
 def xuniqueCombinations(items, n):
     # This code from Python Cookbook recipes: http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/190465
     if n==0: yield []
@@ -884,7 +1107,3 @@ def xuniqueCombinations(items, n):
         for i in xrange(len(items)):
             for cc in xuniqueCombinations(items[i+1:],n-1):
                 yield [items[i]]+cc
-                
-                
-                
-                
