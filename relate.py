@@ -10,11 +10,11 @@ from __future__ import generators
 import string, profile #, time
 import wx
 from random import *
-import Numeric
-from LinearAlgebra import eigenvectors
-from MLab import cov, mean, svd
-from orngMDS import *
-import pyp_metrics, pyp_nrm
+#import Numeric
+#from LinearAlgebra import eigenvectors
+#from MLab import cov, mean, svd
+#from orngMDS import *
+#import pyp_metrics, pyp_nrm
 
 class dataMatrix:
     def __init__(self, data, app):
@@ -769,7 +769,7 @@ class KinGroups(dataMatrix):
     def kinCount(self, count, functionList, allAlive = False):
         idList = self.dict.keys()
         idList.sort()
-        self.errors=`functionList`
+        #self.errors=`functionList`
         matrix=[['ego']]
         for i in functionList: # Create column names
             temp1, temp2 = 'Count ', ''
@@ -865,13 +865,13 @@ class Lineages(dataMatrix):
         lin = [lineages[x][0] for x in lineages if (lineages[x][0] != 0) and x != self.missing]
         stats = {}
         stats['keyOrder'] = ['No. of '+ lineageType +'s', 'Smallest '+ lineageType, 'Largest '+ lineageType, 'Mean ' + lineageType + ' size', 'No. not belonging to any ' + lineageType]
-        stats['No. not belonging to any ' + lineageType] = `lineages[self.missing][0]`
+        #stats['No. not belonging to any ' + lineageType] = `lineages[self.missing][0]`
         #for i in lineages:
             #if lineages[i][0] == 0: del lin[i] # get rid of lineages with 0 living members
         #if self.missing in lin: del lin[self.missing] # Don't want to include number of missing in the stats
-        stats['No. of '+ lineageType +'s'] = `len(lin)`
-        stats['Smallest '+ lineageType] = `min(lin)`
-        stats['Largest '+ lineageType] = `max(lin)`
+        #stats['No. of '+ lineageType +'s'] = `len(lin)`
+        #stats['Smallest '+ lineageType] = `min(lin)`
+        #stats['Largest '+ lineageType] = `max(lin)`
         sum = 0
         for i in lin: sum += i
         stats['Mean ' + lineageType + ' size'] = '%-5d' % round(float(sum)/len(lin))
