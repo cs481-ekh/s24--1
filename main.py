@@ -28,10 +28,14 @@ def cli_init(str_list):
 
     # Parse command line arguments
     for v in range(len(str_list)):
-        if "--g" in str_list[v]:
-            gui_enable = True
+        if "--h" in str_list[v]:
+            retVal = print_usage()
+            break
+        elif "--hf" in str_list[v]:
+            retVal = print_details()
+            break
         elif "--i" in str_list[v]:
-            if len(str_list) <= v:
+            if v >= (len(str_list) - 1):
                 retVal += "--i flag requires a valid filename." + "\n"
             else:
                 input_filename = str_list[v + 1]
@@ -40,12 +44,8 @@ def cli_init(str_list):
                 else:
                     retVal += f"{input_filename} could not be found and was not opened.\n"
 
-        elif "--h" in str_list[v]:
-            retVal = print_usage()
-            break
-        elif "--hf" in str_list[v]:
-            retVal = print_details()
-            break
+        elif "--g" in str_list[v]:
+            gui_enable = True
         elif "--c" in str_list[v]:
             if len(str_list) >= v:
                 retVal += "--c flag requires a valid calculation option."
