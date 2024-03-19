@@ -6,12 +6,10 @@ from Descent import *
 import os
 
 def print_usage():
-    print(f"Descent is a genealogical analysis program that takes in files",file=sys.stdout)
-    print(f"in the format of .csv and presents genealogical output.", file=sys.stdout)
+    return "Descent is a genealogical analysis program that takes in files \nin the format of .csv and presents genealogical output."
 
 def print_details():
-    print_usage()
-    print(f"TODO: The list of options for each flag would be listed here.", file=sys.stdout)
+    return print_usage() + "\nTODO: The list of options for each flag would be listed here."
 
 def select_calc_option(str):
     print(f"TODO: Calculation option {str} would be selected here.", file=sys.stdout)
@@ -23,7 +21,8 @@ def select_out_option(str):
 gui_enable = False
 
 def cli_init(str_list):
-        # Read command line arguments
+    # Read command line arguments
+    retVal = ""
     argc = len(str_list)
     print(f"{argc} arguments read.", file=sys.stderr)
 
@@ -32,30 +31,34 @@ def cli_init(str_list):
         if "--g" in str_list[v]:
             gui_enable = True
         elif "--i" in str_list[v]:
-            if len(str_list) >= v:
-                print("--i flag requires a valid filename.", file=sys.stderr)
+            if len(str_list) <= v:
+                retVal += "--i flag requires a valid filename." + "\n"
             else:
                 input_filename = str_list[v + 1]
                 if os.path.isfile(input_filename):
                     input_file = open(input_filename)
                 else:
-                    print(f"{input_filename} could not be found and was not opened.", file=sys.stderr)
+                    retVal += f"{input_filename} could not be found and was not opened.\n"
 
         elif "--h" in str_list[v]:
-            print_usage()
+            retVal = print_usage()
+            break
         elif "--hf" in str_list[v]:
-            print_details()
+            retVal = print_details()
+            break
         elif "--c" in str_list[v]:
             if len(str_list) >= v:
-                print("--c flag requires a valid calculation option.", file=sys.stderr)
+                retVal += "--c flag requires a valid calculation option."
             else:
                 select_calc_option(str_list[v + 1])
         elif "--o" in str_list[v]:
             if len(str_list) >= v:
-                print("--o flag requires a valid output option.", file=sys.stderr)
+                retVal += "--o flag requires a valid output option."
             else:
                 select_out_option(str_list[v + 1])
+    return retVal
 
+print(cli_init(sys.argv))
 if gui_enable:
     print(f"GUI flag enabled, starting GUI...", file=sys.stderr)
     BuildApp()
