@@ -1,6 +1,7 @@
 import wx
 from wx import *
 import wx.html as html
+from Relate import *
 
 # Global Variables
 appTitle = 'Descent'
