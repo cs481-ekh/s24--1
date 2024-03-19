@@ -2,6 +2,7 @@
 # (Should Start from CLI and run window.py if GUI is chosen)
 
 import sys
+from Descent import *
 import os
 
 def print_usage():
@@ -9,6 +10,7 @@ def print_usage():
     print(f"in the format of .csv and presents genealogical output.", file=sys.stdout)
 
 def print_details():
+    print_usage()
     print(f"TODO: The list of options for each flag would be listed here.", file=sys.stdout)
 
 def select_calc_option(str):
@@ -17,11 +19,11 @@ def select_calc_option(str):
 def select_out_option(str):
     print(f"TODO: Output option {str} would be selected here.", file=sys.stdout)
 
-def cli_init(str_list):
-    # Parameter flags and variables
-    gui_enable = False
+# Parameter flags and variables
+gui_enable = False
 
-    # Read command line arguments
+def cli_init(str_list):
+        # Read command line arguments
     argc = len(str_list)
     print(f"{argc} arguments read.", file=sys.stderr)
 
@@ -54,7 +56,6 @@ def cli_init(str_list):
             else:
                 select_out_option(str_list[v + 1])
 
-    if gui_enable:
-        print(f"GUI flag enabled, starting GUI...", file=sys.stderr)
-
-cli_init(sys.argv)
+if gui_enable:
+    print(f"GUI flag enabled, starting GUI...", file=sys.stderr)
+    BuildApp()
