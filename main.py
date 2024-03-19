@@ -2,7 +2,7 @@
 # (Should Start from CLI and run window.py if GUI is chosen)
 
 import sys
-from Descent import *
+#from Descent import *
 import os
 
 def print_usage():
@@ -58,7 +58,7 @@ def cli_init(str_list):
                 select_out_option(str_list[v + 1])
     return retVal
 
-#print(cli_init(sys.argv))
+print(cli_init(sys.argv))
 if gui_enable:
     print(f"GUI flag enabled, starting GUI...", file=sys.stderr)
     #BuildApp()
