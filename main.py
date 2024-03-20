@@ -44,6 +44,7 @@ def cli_init(str_list):
                 print(os.getcwd())
                 if os.path.isfile(input_filename):
                     dataMan = DataManager(input_filename)
+                    # print(dataMan.getDtat())
                 else:
                     retVal += f"{input_filename} could not be found and was not opened.\n"
 

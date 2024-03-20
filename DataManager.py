@@ -13,15 +13,13 @@ class DataManager:
                     #line = line.strip().split(sepchar)
                     line = line.strip().split(',') # CSV Specific
                     self.data.append([item.strip() for item in line])
-                print(self.data)
             else:
                 print("The DataManager only accepts CSV as a Valid File Format")
-            pass
         except:
             print("There was a problem Initializing the DataManager")
-            return
-
-# Reimplement if not Ziker ever uses Non-CSV Files
+        
+# TODO: Reimplement if Ziker ever uses Non-CSV Files
+    # Broken!!!!
     # def determineSepChar(self, d):
     #     sepchars = ['\t', ',', ' ']
     #     counts = {s: [] for s in sepchars}
@@ -32,3 +30,6 @@ class DataManager:
     #         if count_list[0] != 0 and count_list.count(count_list[0]) == len(count_list):
     #             return sep
     #     return None
+            
+    def getData(self):
+        return self.data
