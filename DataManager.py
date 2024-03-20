@@ -33,3 +33,18 @@ class DataManager:
             
     def getData(self):
         return self.data
+    
+    # TODO: Generic Export Method that takes in a type to determine what data to include
+    def exportData(self, type):
+        exportData = None
+        match type:
+            case "Relatedness":
+                # exportData = Relatedness Export Data
+                print("In Development")
+            case "Kin":
+                # exportData = Kin Export Data
+                print("In Development")
+            # ETC.
+        
+        #TODO: Export data using exportData
+        pass
