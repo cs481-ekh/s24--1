@@ -41,8 +41,9 @@ def cli_init(str_list):
                 retVal += "--i flag requires a valid filename." + "\n"
             else:
                 input_filename = str_list[v + 1]
+                print(os.getcwd())
                 if os.path.isfile(input_filename):
-                    dataMan = DataManager.__init__(dataMan, input_filename)
+                    dataMan = DataManager(input_filename)
                 else:
                     retVal += f"{input_filename} could not be found and was not opened.\n"
 
