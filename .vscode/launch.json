@@ -16,6 +16,13 @@
             "type": "debugpy",
             "request": "launch",
             "program": "main.py"
+        },
+        {
+            "name": "Run CLI w/ File",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "main.py",
+            "args": "--i "
         }
     ]
 }

@@ -3,6 +3,7 @@
 
 import sys
 #from Descent import *
+from DataManager import *
 import os
 
 def print_usage():
@@ -19,6 +20,7 @@ def select_out_option(str):
 
 # Parameter flags and variables
 gui_enable = False
+dataMan = None # DataManager Object
 
 def cli_init(str_list):
     # Read command line arguments
@@ -40,7 +42,7 @@ def cli_init(str_list):
             else:
                 input_filename = str_list[v + 1]
                 if os.path.isfile(input_filename):
-                    input_file = open(input_filename)
+                    dataMan = DataManager.__init__(dataMan, input_filename)
                 else:
                     retVal += f"{input_filename} could not be found and was not opened.\n"
 
