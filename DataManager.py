@@ -17,6 +17,11 @@ class DataManager:
                 print("The DataManager only accepts CSV as a Valid File Format")
         except:
             print("There was a problem Initializing the DataManager")
+
+    def initializeTableFormat(self):
+
+        pass
+        
         
 # TODO: Reimplement if Ziker ever uses Non-CSV Files
     # Broken!!!!
