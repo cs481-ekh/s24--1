@@ -14,7 +14,7 @@ from random import *
 #from LinearAlgebra import eigenvectors
 #from MLab import cov, mean, svd
 #from orngMDS import *
-#import pyp_metrics, pyp_nrm
+#from Assets.PyPedal import pyp_metrics, pyp_nrm
 
  
 # Object that connects the Input File Data to our App Object
