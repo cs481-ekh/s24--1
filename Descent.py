@@ -22,8 +22,7 @@ from numpy.linalg import svd
 from CustomDataTable import *
 from Relate import *
 
-import pyp_newclasses, pyp_metrics
-
+from Assets.PyPedal import pyp_newclasses, pyp_metrics
 
 # Global Variables
 appTitle = 'Descent'
