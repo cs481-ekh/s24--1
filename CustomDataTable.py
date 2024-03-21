@@ -34,7 +34,7 @@
 import wx.grid
 from wx.grid import *
 import os
-from relate import KinGroups
+from Relate import KinGroups
 import pyp_newclasses, pyp_metrics
 
 
