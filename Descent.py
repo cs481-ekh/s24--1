@@ -9,38 +9,30 @@
 
 
 import os, sys
-#sys.path.append(os.getcwd()) # Adds working directory to PYTHONPATH
-#print sys.path
-
 import warnings
-# warnings.filterwarnings("ignore", category=DeprecationWarning)
-
-# import visual
-
 import wx
-# import wx.lib.scrolledpanel as scrolled
-import wx.html as html                   #PeterBusche
-# from wxPython.html import *
-
-# from CustomDataTable import *
-from CustomDataTable import CustomDataTable, Genealogy, GenealogyFLO, ConvertIDToNumber, CustTableGrid
-
-from relate import *
-import pyp_newclasses, pyp_metrics
-
-# import wxPyPlot2 as wxPyPlot
-
+import wx.html as html
 import time, random, pydot, re, tempfile
 
 # import Numeric, MLab
-import numpy as np                      #PeterBusche
-from numpy import cov, mean             #PeterBusche
-from numpy.linalg import svd            #PeterBusche
+import numpy as np
+from numpy import cov, mean
+from numpy.linalg import svd
 
+from CustomDataTable import *
+from Relate import *
+
+import pyp_newclasses, pyp_metrics
+
+
+# Global Variables
 appTitle = 'Descent'
-__version__ = "0.2.0.2"
+__version__ = "2.0"
+app = None
+path = None
 
 class MyFrame(wx.Frame):
+    # Runs automatically, initializes application opbject
     def __init__(self, parent, id, title):
         super(MyFrame, self).__init__(parent, title=title, size=(600, 400))
 
@@ -116,7 +108,7 @@ class MyFrame(wx.Frame):
         # Create the notebook
         self.CreateNotebook()
 
-    # done
+    # Builds global tabs
     def CreateNotebook(self):
         # Create notebook for frame with help panel showing
         self.notebook = Notebook(self, wx.ID_ANY, wx.Point(0, 0), wx.Size(602, 400))
@@ -1904,7 +1896,7 @@ class HelpPanel(Panel):
     def __init__(self, parent):
         super(HelpPanel, self).__init__(parent)
         self.html = html.HtmlWindow(self, -1, pos=(125, 1), size=(470, 373), style=wx.NO_FULL_REPAINT_ON_RESIZE)
-        self.html.LoadPage('help/index.html')
+        self.html.LoadPage('Assets/HelpPanel/index.html')
         self.choices = ['Splash', 'Introduction', 'Input file format', 'KINDEMCOM files', 'Error checking', 'Relatedness', 'Founders', 'Lineages', 'Counting kin', 'Kin', 'Groups', 'Plotting', 'PCA', 'Sorting', 'License', 'Change log', 'Bugs', 'Contact info', 'Acknowledgements']
         self.helpControl = wx.ListBox(self, 130, pos=(1, 1), size=(123, 373), choices=self.choices, style=wx.LB_NEEDED_SB)
         self.helpControl.Bind(wx.EVT_LISTBOX, self.OnHelpSelect)
@@ -1919,12 +1911,9 @@ class HelpPanel(Panel):
         #     wx.EVT_LISTBOX(self, 130, self.OnHelpSelect)
         #======================================================================
 
-
-
-
     def OnHelpSelect(self, event):
         helpSection = self.choices[event.GetSelection()]
-        self.html.LoadPage('help/index.html#' + helpSection)
+        self.html.LoadPage('Assets/HelpPanel/index.html#' + helpSection)
 
     def EnableMenus(self):
         try:
@@ -1946,13 +1935,16 @@ class ChoiceMenu(wx.Choice):
         # else: self.SetSelection(0)
         pass
 
+# Builds App and Window
 class MyApp(wx.App):
     def OnInit(self):
-        self.frame = MyFrame(None, -1, appTitle)
-        self.frame.Show(True)
+        frame = MyFrame(None, -1, appTitle)
+        frame.Show(True)
         self.SetTopWindow(self.frame)
         return True
 
-if __name__ == "__main__":
-    app = MyApp()
+def BuildApp():
+    app = MyApp(0) # MyApp(1) redirects errors to program window
+
+    # Sustains Window
     app.MainLoop()
