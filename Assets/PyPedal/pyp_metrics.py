@@ -53,9 +53,9 @@ import pickle
 import random
 import sys
 
-from pyp_nrm import *
-import pyp_utils
-import pyp_nrm
+from Assets.PyPedal import pyp_nrm
+from Assets.PyPedal import pyp_utils
+from Assets.PyPedal import pyp_nrm
 # import pyp_io
 
 ##

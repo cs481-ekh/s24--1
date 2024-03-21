@@ -12,7 +12,7 @@ import os, sys
 import warnings
 import wx
 import wx.html as html
-import time, random, pydot, re, tempfile
+import time#, random, pydot, re, tempfile
 
 # import Numeric, MLab
 import numpy as np

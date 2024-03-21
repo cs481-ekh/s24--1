@@ -1,2 +1,4 @@
 wxpython
 pytest
+numpy
+pydot

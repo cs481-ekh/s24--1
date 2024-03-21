@@ -19,7 +19,7 @@
 # pyp_demog contains a set of procedures for demographic calculations on the
 # population describe in a pedigree.
 
-import pyp_utils
+from Assets.PyPedal import pyp_utils
 
 # Define some globals in case the user forgets to call set_base_year() and
 # set_age_units().

@@ -40,11 +40,11 @@
 
 from numpy import *
 import os
-from pyp_classes import *
-from pyp_demog import *
-import pyp_metrics
-import pyp_newclasses
-from pyp_newclasses import *
+from Assets.PyPedal import pyp_classes
+from Assets.PyPedal import pyp_demog
+from Assets.PyPedal import pyp_metrics
+from Assets.PyPedal import pyp_newclasses
+from Assets.PyPedal import pyp_newclasses
 import string
 import sys
 from time import *
