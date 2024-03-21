@@ -1939,11 +1939,10 @@ class MyApp(wx.App):
     def OnInit(self):
         frame = MyFrame(None, -1, appTitle)
         frame.Show(True)
-        self.SetTopWindow(self.frame)
         return True
 
 def BuildApp():
-    app = MyApp(0) # MyApp(1) redirects errors to program window
+    app = MyApp(1) # MyApp(1) redirects errors to program window
 
     # Sustains Window
     app.MainLoop()

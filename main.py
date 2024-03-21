@@ -49,6 +49,7 @@ def cli_init(str_list):
                     retVal += f"{input_filename} could not be found and was not opened.\n"
 
         elif "--g" in str_list[v]:
+            global gui_enable
             gui_enable = True
         elif "--c" in str_list[v]:
             if len(str_list) >= v:
