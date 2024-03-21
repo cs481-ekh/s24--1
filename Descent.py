@@ -1939,6 +1939,7 @@ class MyApp(wx.App):
     def OnInit(self):
         frame = MyFrame(None, -1, appTitle)
         frame.Show(True)
+        self.SetTopWindow(self.frame)
         return True
 
 def BuildApp():
