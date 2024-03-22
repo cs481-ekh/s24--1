@@ -1,4 +1,7 @@
 import pandas as pd
+# Excellent Documntation for Pandas
+# https://pandas.pydata.org/docs/reference/frame.html
+
 
 class DataManager:
     # Initializes DataManager using Input File
@@ -31,14 +34,21 @@ class DataManager:
             column_names = [f'Column{i+1}' for i in range(num_columns)]
         
         self.df = pd.DataFrame(data, columns=column_names)
+
+        # Formatting
+        self.df.replace('', None)
     
         return self.df
     
     #region ========== MATH + PyPedal ==========
 
+    def calculateRelateDataTable(self):
+        
+        pass
+
     #endregion
 
-    #region ========== UTILS ==========
+    #region ========== Pandas Utils ==========
 
     # Sorts DataFrame by one column
     # Returns sorted version, but does not change the actual df
@@ -48,38 +58,71 @@ class DataManager:
     
     # Returns Number of Entries
     def GetNumberRows(self):
-        return len(self.data)
-
+        return len(self.df)
+    
     # Returns Number of Columns
     def GetNumberCols(self):
-        return len(self.data[0])
-
-    # Determines if cell is empty
-    def IsEmptyCell(self, row, col):
-        return not self.data[row][col] == ''
-
+        return len(self.df.columns)
+    
     # Returns value of single cell
+    # Row is Index, Column is ColumnName (Ego, Father, Mother, ...)
     def GetValue(self, row, col):
         try:
-            return str(self.data[row][col])
+            return str(self.df.at[row, col])
         except IndexError:
-            return ''
-
-    # Returns a full row
-    def GetLine(self, row):
-        try:
-            return self.data[row]
-        except IndexError:
-            return ''
+            return None
+    
+    # Returns T/F if single value is ''
+    # Row is Index, Column is ColumnName (Ego, Father, Mother, ...)
+    def IsEmptyCell(self, row, col):
+        return self.GetValue(row, col) == ''
+    
+    # Returns a single row from data
+    def GetLine(self, index):
+        return self.df.iloc[index]
     
     # Returns complete dataset
     def getData(self):
-        return self.data
+        return self.df
+
+    #endregion
+
+    #region ========== UTILS OLD DESCENT ==========
+    
+    # # Returns Number of Entries
+    # def GetNumberRows(self):
+    #     return len(self.data)
+
+    # # Returns Number of Columns
+    # def GetNumberCols(self):
+    #     return len(self.data[0])
+
+    # # Determines if cell is empty
+    # def IsEmptyCell(self, row, col):
+    #     return not self.data[row][col] == ''
+
+    # # Returns value of single cell
+    # def GetValue(self, row, col):
+    #     try:
+    #         return str(self.data[row][col])
+    #     except IndexError:
+    #         return ''
+
+    # # Returns a full row
+    # def GetLine(self, row):
+    #     try:
+    #         return self.data[row]
+    #     except IndexError:
+    #         return ''
+    
+    # # Returns complete dataset
+    # def getData(self):
+    #     return self.data
     
     #endregion
     
     # TODO: Generic Export Method that takes in a type to determine what data to include
-    def exportData(self, type):
+    def exportData(self, data, type):
         exportData = None
         match type:
             case "Relatedness":
