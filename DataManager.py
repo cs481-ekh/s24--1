@@ -4,18 +4,16 @@ import pandas as pd
 
 
 class DataManager:
-    # Initializes DataManager using Input File
-    def __init__(self, file):
+    # Initializes DataManager using Input File Name (../Example.csv)
+    def __init__(self, filename):
         try:
             self.data = []
             self.dataFrame = None
 
-            if file.endswith('.csv'): # CSV Only
-                with open(file, 'r') as f:
+            if filename.endswith('.csv'): # CSV Only
+                with open(filename, 'r') as f:
                     temp = f.readlines()
-                #sepchar = self.determineSepChar(temp)
                 for line in temp:
-                    #line = line.strip().split(sepchar)
                     line = line.strip().split(',') # CSV Specific
                     self.data.append([item.strip() for item in line])
             else:
@@ -121,17 +119,17 @@ class DataManager:
     
     #endregion
     
-    # TODO: Generic Export Method that takes in a type to determine what data to include
-    def exportData(self, data, type):
-        exportData = None
-        match type:
-            case "Relatedness":
-                # exportData = Relatedness Export Data
-                print("In Development")
-            case "Kin":
-                # exportData = Kin Export Data
-                print("In Development")
-            # ETC.
+    # # TODO: Generic Export Method that takes in a type to determine what data to include
+    # def exportData(self, data, type):
+    #     exportData = None
+    #     match type:
+    #         case "Relatedness":
+    #             # exportData = Relatedness Export Data
+    #             print("In Development")
+    #         case "Kin":
+    #             # exportData = Kin Export Data
+    #             print("In Development")
+    #         # ETC.
         
-        #TODO: Export data using exportData
-        pass
+    #     #TODO: Export data using exportData
+    #     pass
