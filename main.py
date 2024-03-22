@@ -2,7 +2,7 @@
 # (Should Start from CLI and run window.py if GUI is chosen)
 
 import sys
-from Descent import *
+#from Descent import *
 from DataManager import *
 import os
 
@@ -43,7 +43,9 @@ def cli_init(str_list):
                 input_filename = str_list[v + 1]
                 print(os.getcwd())
                 if os.path.isfile(input_filename):
+                    global dataMan
                     dataMan = DataManager(input_filename)
+                    dataMan.createPandasDataFrame(dataMan.data)
                     # print(dataMan.getData())
                 else:
                     retVal += f"{input_filename} could not be found and was not opened.\n"
@@ -66,4 +68,4 @@ def cli_init(str_list):
 print(cli_init(sys.argv))
 if gui_enable:
     print(f"GUI flag enabled, starting GUI...", file=sys.stderr)
-    BuildApp()
+    #BuildApp()

@@ -2,3 +2,4 @@ wxpython
 pytest
 numpy
 pydot
+pandas

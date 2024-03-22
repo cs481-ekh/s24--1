@@ -1,10 +1,12 @@
-
+import pandas as pd
 
 class DataManager:
     # Initializes DataManager using Input File
     def __init__(self, file):
         try:
             self.data = []
+            self.dataFrame = None
+
             if file.endswith('.csv'): # CSV Only
                 with open(file, 'r') as f:
                     temp = f.readlines()
@@ -17,24 +19,33 @@ class DataManager:
                 print("The DataManager only accepts CSV as a Valid File Format")
         except:
             print("There was a problem Initializing the DataManager")
+    
+    def createPandasDataFrame(self, data, columnOrder=['Ego', 'Father', 'Mother', 'Sex', 'Living']):
+        num_columns = len(data[0])
+
+        if columnOrder:
+            column_names = columnOrder
+        else:
+            column_names = [f'Column{i+1}' for i in range(num_columns)]
+        
+        self.df = pd.DataFrame(data, columns=column_names)
+    
+        return self.df
+    
+    def sort_family_tree(df, by='Ego'):
+        sorted_df = df.sort_values(by=by)
+        return sorted_df
 
     def initializeTableFormat(self):
-
+        self.dict ={}
+        for i in self.data:
+            self.dict[i[self.fieldDef['ego']]]={
+                'dad':i[self.fieldDef['father']],
+                'mom':i[self.fieldDef['mother']],
+                'sex':i[self.fieldDef['sex']],
+                'row':self.data.index(i)
+            }
         pass
-        
-        
-# TODO: Reimplement if Ziker ever uses Non-CSV Files
-    # Broken!!!!
-    # def determineSepChar(self, d):
-    #     sepchars = ['\t', ',', ' ']
-    #     counts = {s: [] for s in sepchars}
-    #     for line in d[:100]:
-    #         for sep in sepchars:
-    #             counts[sep].append(line.count(sep))
-    #     for sep, count_list in counts.items():
-    #         if count_list[0] != 0 and count_list.count(count_list[0]) == len(count_list):
-    #             return sep
-    #     return None
             
     def getData(self):
         return self.data
