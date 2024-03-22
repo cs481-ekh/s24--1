@@ -20,6 +20,8 @@ class DataManager:
         except:
             print("There was a problem Initializing the DataManager")
     
+    # Packs data into Pandas DataFrame Object
+    # Requires Data and Alternate Column Order if applicable
     def createPandasDataFrame(self, data, columnOrder=['Ego', 'Father', 'Mother', 'Sex', 'Living']):
         num_columns = len(data[0])
 
@@ -32,23 +34,49 @@ class DataManager:
     
         return self.df
     
-    def sort_family_tree(df, by='Ego'):
+    #region ========== MATH + PyPedal ==========
+
+    #endregion
+
+    #region ========== UTILS ==========
+
+    # Sorts DataFrame by one column
+    # Returns sorted version, but does not change the actual df
+    def SortDataByCol(df, by='Ego'):
         sorted_df = df.sort_values(by=by)
         return sorted_df
+    
+    # Returns Number of Entries
+    def GetNumberRows(self):
+        return len(self.data)
 
-    def initializeTableFormat(self):
-        self.dict ={}
-        for i in self.data:
-            self.dict[i[self.fieldDef['ego']]]={
-                'dad':i[self.fieldDef['father']],
-                'mom':i[self.fieldDef['mother']],
-                'sex':i[self.fieldDef['sex']],
-                'row':self.data.index(i)
-            }
-        pass
-            
+    # Returns Number of Columns
+    def GetNumberCols(self):
+        return len(self.data[0])
+
+    # Determines if cell is empty
+    def IsEmptyCell(self, row, col):
+        return not self.data[row][col] == ''
+
+    # Returns value of single cell
+    def GetValue(self, row, col):
+        try:
+            return str(self.data[row][col])
+        except IndexError:
+            return ''
+
+    # Returns a full row
+    def GetLine(self, row):
+        try:
+            return self.data[row]
+        except IndexError:
+            return ''
+    
+    # Returns complete dataset
     def getData(self):
         return self.data
+    
+    #endregion
     
     # TODO: Generic Export Method that takes in a type to determine what data to include
     def exportData(self, type):
