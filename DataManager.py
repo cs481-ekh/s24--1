@@ -40,9 +40,6 @@ class DataManager:
             column_names = [f'Column{i+1}' for i in range(num_columns)]
         
         self.df = pd.DataFrame(self.data, columns=column_names)
-
-        # Formatting
-        #self.df.replace('', None)
     
         return self.df
     
@@ -85,7 +82,7 @@ class DataManager:
     
     # Returns a single row from data
     def GetLine(self, index):
-        return self.df.iloc[index]
+        return self.df.iloc[index].to_numpy()
     
     # Returns complete dataset
     def getData(self):

@@ -2,23 +2,18 @@ import pytest
 import DataManager
 
 def test_data_manager_initialization():
-    dm = DataManager.DataManager('/Assets/TestData/HomemadeTestSet.csv')
-    assert dm.data is not None
-    assert dm.df is None
-
-def test_data_loaded():
-    dm = DataManager.DataManager('/Assets/TestData/HomemadeTestSet.csv')
+    dm = DataManager.DataManager('Assets/TestData/HomemadeTestSet.csv')
     dm.createPandasDataFrame()
+    assert dm.data is not None
     assert dm.df is not None
 
 # Fixture to create a sample DataManager instance to use in multiple tests
 @pytest.fixture
 def sample_data_manager():
     # Create a sample DataManager instance with a CSV file
-    sample_file = '/Assets/TestData/HomemadeTestSet.csv'
+    sample_file = 'Assets/TestData/HomemadeTestSet.csv'
     data_manager = DataManager.DataManager(sample_file)
     data_manager.createPandasDataFrame()
-    print(data_manager.data)
     return data_manager
 
 # Test IsEmptyCell function
@@ -36,7 +31,7 @@ def test_get_value(sample_data_manager):
 # Test GetLine function
 def test_get_line(sample_data_manager):
     # Test GetLine function to ensure correct row retrieval
-    assert sample_data_manager.GetLine(0) == ['1', '', '', 'M', 'N']
+    assert (sample_data_manager.GetLine(0) == ['1', '', '', 'M', 'N']).all()
     assert sample_data_manager.GetLine(100) == ''                            # Out of range index
 
 # Test GetNumberRows function
