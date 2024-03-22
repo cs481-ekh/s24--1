@@ -13,17 +13,17 @@
             "args": "--g"
         },
         {
-            "name": "Run with input file",
-            "type": "debugpy",
-            "request": "launch",
-            "program": "main.py",
-            "args": "--i fake_file.csv"
-        },
-        {
             "name": "Run Blank CLI",
             "type": "debugpy",
             "request": "launch",
             "program": "main.py"
+        },
+        {
+            "name": "Run with Fake File",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "main.py",
+            "args": "--i fake_file.csv"
         },
         {
             "name": "Run CLI w/ File",

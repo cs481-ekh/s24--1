@@ -8,7 +8,7 @@ class DataManager:
     def __init__(self, filename):
         try:
             self.data = []
-            self.dataFrame = None
+            self.df = None
 
             if filename.endswith('.csv'): # CSV Only
                 with open(filename, 'r') as f:
@@ -23,18 +23,26 @@ class DataManager:
     
     # Packs data into Pandas DataFrame Object
     # Requires Data and Alternate Column Order if applicable
-    def createPandasDataFrame(self, data, columnOrder=['Ego', 'Father', 'Mother', 'Sex', 'Living']):
-        num_columns = len(data[0])
+    def createPandasDataFrame(self, columnOrder=['Ego', 'Father', 'Mother', 'Sex', 'Living']):
+        if self.data is None:
+            print("You can't create the DataFrame: Data is None")
+            return
+
+        num_columns = len(self.data[0])
+
+        # Removes first row if it is header
+        if not self.data[0][0].isnumeric():
+            del self.data[0]
 
         if columnOrder:
             column_names = columnOrder
         else:
             column_names = [f'Column{i+1}' for i in range(num_columns)]
         
-        self.df = pd.DataFrame(data, columns=column_names)
+        self.df = pd.DataFrame(self.data, columns=column_names)
 
         # Formatting
-        self.df.replace('', None)
+        #self.df.replace('', None)
     
         return self.df
     

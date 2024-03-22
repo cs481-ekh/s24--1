@@ -30,11 +30,6 @@ def cli_init(str_list):
     retVal = ""
     argc = len(str_list)
     print(f"{argc} arguments read.", file=sys.stderr)
-def cli_init(str_list):
-    # Read command line arguments
-    retVal = ""
-    argc = len(str_list)
-    print(f"{argc} arguments read.", file=sys.stderr)
 
     # Parse command line arguments
     for v in range(len(str_list)):
@@ -53,7 +48,7 @@ def cli_init(str_list):
                 if os.path.isfile(input_filename):
                     global dataMan
                     dataMan = DataManager(input_filename)
-                    dataMan.createPandasDataFrame(dataMan.data)
+                    dataMan.createPandasDataFrame()
                     # print(dataMan.getData())
                 else:
                     retVal += f"{input_filename} could not be found and was not opened.\n"
@@ -72,39 +67,7 @@ def cli_init(str_list):
             else:
                 select_out_option(str_list[v + 1])
     return retVal
-    # Parse command line arguments
-    for v in range(len(str_list)):
-        if "--h" in str_list[v]:
-            retVal = print_usage()
-            break
-        elif "--hf" in str_list[v]:
-            retVal = print_details()
-            break
-        elif "--i" in str_list[v]:
-            if v >= (len(str_list) - 1):
-                retVal += "--i flag requires a valid filename." + "\n"
-            else:
-                input_filename = str_list[v + 1]
-                if os.path.isfile(input_filename):
-                    input_file = open(input_filename)
-                else:
-                    retVal += f"{input_filename} could not be found and was not opened.\n"
 
-        elif "--g" in str_list[v]:
-            gui_enable = True
-        elif "--c" in str_list[v]:
-            if len(str_list) >= v:
-                retVal += "--c flag requires a valid calculation option."
-            else:
-                select_calc_option(str_list[v + 1])
-        elif "--o" in str_list[v]:
-            if len(str_list) >= v:
-                retVal += "--o flag requires a valid output option."
-            else:
-                select_out_option(str_list[v + 1])
-    return retVal
-
-print(cli_init(sys.argv))
 print(cli_init(sys.argv))
 if gui_enable:
     print(f"GUI flag enabled, starting GUI...", file=sys.stderr)
