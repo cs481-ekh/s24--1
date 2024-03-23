@@ -69,6 +69,7 @@ class DataManager:
     
     # Returns value of single cell
     # Row is Index, Column is ColumnName (Ego, Father, Mother, ...)
+        # df.iat is a possible alternative?
     def GetValue(self, row, col):
         try:
             return str(self.df.at[row, col])
@@ -82,10 +83,13 @@ class DataManager:
     
     # Returns a single row from data
     def GetLine(self, index):
-        return self.df.iloc[index].to_numpy()
+        try:
+            return self.df.iloc[index].to_numpy()
+        except IndexError:
+            return None
     
     # Returns complete dataset
-    def getData(self):
+    def GetData(self):
         return self.df
 
     #endregion

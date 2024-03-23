@@ -1,4 +1,5 @@
 import pytest
+import numpy
 import DataManager
 
 def test_data_manager_initialization():
@@ -22,7 +23,7 @@ def test_is_empty_cell(sample_data_manager):
     assert sample_data_manager.IsEmptyCell(0, 'Ego') == False  # Non-empty cell
     assert sample_data_manager.IsEmptyCell(0, 'Father') == True   # Empty cell
 
-# Test GetValue function
+# Test GetValueUsingColName function
 def test_get_value(sample_data_manager):
     # Test GetValue function to ensure correct value retrieval
     assert sample_data_manager.GetValue(0, 'Ego') == '1'
@@ -31,8 +32,9 @@ def test_get_value(sample_data_manager):
 # Test GetLine function
 def test_get_line(sample_data_manager):
     # Test GetLine function to ensure correct row retrieval
-    assert (sample_data_manager.GetLine(0) == ['1', '', '', 'M', 'N']).all()
-    assert sample_data_manager.GetLine(100) == ''                            # Out of range index
+    expected_result = numpy.array(['1', '', '', 'M', 'N'])
+    assert numpy.array_equal(sample_data_manager.GetLine(0), expected_result)
+    assert sample_data_manager.GetLine(100) == None                              # Out of range index
 
 # Test GetNumberRows function
 def test_get_number_rows(sample_data_manager):
