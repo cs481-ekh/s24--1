@@ -36,13 +36,23 @@ class DataManager:
         if not self.data[0][0].isnumeric():
             del self.data[0]
 
+        # Updtates Column Order as needed
         if columnOrder:
             column_names = columnOrder
         else:
             column_names = [f'Column{i+1}' for i in range(num_columns)]
         
+        # Puts Data into DataFrame
         self.df = pd.DataFrame(self.data, columns=column_names)
-        self.df['Ego'] = self.df['Ego'].astype(int)
+
+        # Data Formatting
+        self.df.replace('', None, inplace=True)
+        self.df['Ego'] = pd.to_numeric(self.df['Ego'], errors='coerce').astype(pd.Int64Dtype())
+        self.df['Father'] = pd.to_numeric(self.df['Father'], errors='coerce').astype(pd.Int64Dtype())
+        self.df['Mother'] = pd.to_numeric(self.df['Mother'], errors='coerce').astype(pd.Int64Dtype())
+        self.df['Sex'] = self.df['Sex'].astype(str)
+        self.df['Living'] = self.df['Living'].astype(str)
+
     
         return self.df
     
@@ -50,7 +60,6 @@ class DataManager:
 
     # Returns a DataFrame of size N x N
     # Calculates the relatedness of each individual to each individual
-    # TODO: Currently No Math Done (Change Random() to actual function)
     def calculateRMatrix(self):
         try:
             num_individuals = len(self.df)
@@ -70,6 +79,7 @@ class DataManager:
     # Recursively Determines two individual's relatedness
     # Takes in Ego i and Ego j of self.df
     # Takes in blank set: visited, to not repeat people
+    # TODO: Currently Returns Error: `Error calculating RMatrix: boolean value of NA is ambiguous`
     def calculateRelatedness(self, i, j, visited):
         # Check if individuals i and j are the same individual
         if i == j:
