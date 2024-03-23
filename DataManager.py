@@ -1,7 +1,5 @@
-import pandas as pd
+import pandas as pd # Excellent Documentation: https://pandas.pydata.org/docs/reference/frame.html
 import numpy as np
-# Excellent Documntation for Pandas
-# https://pandas.pydata.org/docs/reference/frame.html
 
 
 class DataManager:
@@ -48,6 +46,7 @@ class DataManager:
         # Data Formatting
         self.df.replace('', None, inplace=True)
 
+        # TODO: Possible Solutions to Error in RMatrix
         # self.df['Ego'] = pd.to_numeric(self.df['Ego'], errors='coerce').astype(pd.Int64Dtype())
         # self.df['Father'] = pd.to_numeric(self.df['Father'], errors='coerce').astype(pd.Int64Dtype())
         # self.df['Mother'] = pd.to_numeric(self.df['Mother'], errors='coerce').astype(pd.Int64Dtype())
@@ -184,40 +183,6 @@ class DataManager:
     def GetData(self):
         return self.df
 
-    #endregion
-
-    #region ========== UTILS OLD DESCENT ==========
-    
-    # # Returns Number of Entries
-    # def GetNumberRows(self):
-    #     return len(self.data)
-
-    # # Returns Number of Columns
-    # def GetNumberCols(self):
-    #     return len(self.data[0])
-
-    # # Determines if cell is empty
-    # def IsEmptyCell(self, row, col):
-    #     return not self.data[row][col] == ''
-
-    # # Returns value of single cell
-    # def GetValue(self, row, col):
-    #     try:
-    #         return str(self.data[row][col])
-    #     except IndexError:
-    #         return ''
-
-    # # Returns a full row
-    # def GetLine(self, row):
-    #     try:
-    #         return self.data[row]
-    #     except IndexError:
-    #         return ''
-    
-    # # Returns complete dataset
-    # def getData(self):
-    #     return self.data
-    
     #endregion
     
     # # TODO: Generic Export Method that takes in a type to determine what data to include
