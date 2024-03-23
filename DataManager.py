@@ -48,7 +48,7 @@ class DataManager:
     
     #region ========== MATH + PyPedal ==========
 
-    # Returns a DataFrame of size NxN
+    # Returns a DataFrame of size N x N
     # Calculates the relatedness of each individual to each individual
     # TODO: Currently No Math Done (Change Random() to actual function)
     def calculateRMatrix(self):
