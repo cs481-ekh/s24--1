@@ -47,11 +47,20 @@ class DataManager:
 
         # Data Formatting
         self.df.replace('', None, inplace=True)
-        self.df['Ego'] = pd.to_numeric(self.df['Ego'], errors='coerce').astype(pd.Int64Dtype())
-        self.df['Father'] = pd.to_numeric(self.df['Father'], errors='coerce').astype(pd.Int64Dtype())
-        self.df['Mother'] = pd.to_numeric(self.df['Mother'], errors='coerce').astype(pd.Int64Dtype())
+
+        # self.df['Ego'] = pd.to_numeric(self.df['Ego'], errors='coerce').astype(pd.Int64Dtype())
+        # self.df['Father'] = pd.to_numeric(self.df['Father'], errors='coerce').astype(pd.Int64Dtype())
+        # self.df['Mother'] = pd.to_numeric(self.df['Mother'], errors='coerce').astype(pd.Int64Dtype())
+        # self.df['Ego'] = self.df['Ego'].apply(self.convert_to_int)
+        # self.df['Father'] = self.df['Father'].apply(self.convert_to_int)
+        # self.df['Mother'] = self.df['Mother'].apply(self.convert_to_int)
+        self.df['Ego'] = self.df['Ego'].astype(int)
+        # self.df['Father'] = self.df['Father'].astype(int)
+        # self.df['Mother'] = self.df['Mother'].astype(int)
         self.df['Sex'] = self.df['Sex'].astype(str)
         self.df['Living'] = self.df['Living'].astype(str)
+
+        
 
     
         return self.df
@@ -79,7 +88,7 @@ class DataManager:
     # Recursively Determines two individual's relatedness
     # Takes in Ego i and Ego j of self.df
     # Takes in blank set: visited, to not repeat people
-    # TODO: Currently Returns Error: `Error calculating RMatrix: boolean value of NA is ambiguous`
+    # TODO: Currently Returns Error: `Error calculating RMatrix: Cannot index by location index with a non-integer key`
     def calculateRelatedness(self, i, j, visited):
         # Check if individuals i and j are the same individual
         if i == j:
@@ -127,6 +136,12 @@ class DataManager:
 
     #region ========== Pandas Utils ==========
 
+    def convert_to_int(value):
+        try:
+            return int(value)
+        except (ValueError, TypeError):
+            return None
+
     # Sorts DataFrame by one column
     # Returns sorted version, but does not change the actual df
     def SortDataByCol(df, by='Ego'):
@@ -146,14 +161,17 @@ class DataManager:
         # df.iat is a possible alternative?
     def GetValue(self, row, col):
         try:
-            return str(self.df.at[row, col])
+            ret = str(self.df.at[row, col])
+            if ret == 'None':
+                return None
+            return ret
         except IndexError:
             return None
     
     # Returns T/F if single value is ''
     # Row is Index, Column is ColumnName (Ego, Father, Mother, ...)
     def IsEmptyCell(self, row, col):
-        return self.GetValue(row, col) == ''
+        return self.GetValue(row, col) == None
     
     # Returns a single row from data
     def GetLine(self, index):
