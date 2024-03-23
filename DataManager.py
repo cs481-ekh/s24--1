@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 # Excellent Documntation for Pandas
 # https://pandas.pydata.org/docs/reference/frame.html
 
@@ -9,6 +10,7 @@ class DataManager:
         try:
             self.data = []
             self.df = None
+            self.rm = None
 
             if filename.endswith('.csv'): # CSV Only
                 with open(filename, 'r') as f:
@@ -40,14 +42,76 @@ class DataManager:
             column_names = [f'Column{i+1}' for i in range(num_columns)]
         
         self.df = pd.DataFrame(self.data, columns=column_names)
+        self.df['Ego'] = self.df['Ego'].astype(int)
     
         return self.df
     
     #region ========== MATH + PyPedal ==========
 
-    def calculateRelateDataTable(self):
+    # Returns a DataFrame of size NxN
+    # Calculates the relatedness of each individual to each individual
+    # TODO: Currently No Math Done (Change Random() to actual function)
+    def calculateRMatrix(self):
+        try:
+            num_individuals = len(self.df)
+            r_matrix = pd.DataFrame(index=self.df['Ego'], columns=self.df['Ego'])
+
+            for i in range(num_individuals):
+                for j in range(num_individuals):
+                    # Calculate relatedness between individuals i and j
+                    relatedness = self.calculateRelatedness(i, j, set())
+                    r_matrix.iloc[i, j] = relatedness
+
+            return r_matrix
+        except Exception as e:
+            print("Error calculating RMatrix:", e)
+            return None
+    
+    # Recursively Determines two individual's relatedness
+    # Takes in Ego i and Ego j of self.df
+    # Takes in blank set: visited, to not repeat people
+    def calculateRelatedness(self, i, j, visited):
+        # Check if individuals i and j are the same individual
+        if i == j:
+            return 1  # Full relatedness to oneself
         
-        pass
+        # Check if the relatedness between i and j has already been calculated
+        if (i, j) in visited or (j, i) in visited:
+            return 0  # Avoid infinite recursion
+        
+        # Add the current pair to the set of visited pairs
+        visited.add((i, j))
+        
+        # Check if individuals i and j share a parent
+        if self.isParent(i, j) or self.isParent(j, i):
+            return 0.5  # Relatedness to a parent
+        
+        # Check if individuals i and j share a sibling
+        if self.isSibling(i, j):
+            return 0.25  # Relatedness to a sibling
+        
+        # Check if individuals i and j are distantly related through common ancestors
+        for parent_i in [self.df.iloc[i]['Father'], self.df.iloc[i]['Mother']]:
+            if pd.notnull(parent_i):
+                for parent_j in [self.df.iloc[j]['Father'], self.df.iloc[j]['Mother']]:
+                    if pd.notnull(parent_j):
+                        relatedness = self.calculateRelatedness(parent_i, parent_j, visited)
+                        if relatedness > 0:
+                            # Found a common ancestor
+                            return relatedness * 0.5  # Relatedness is halved for each generation
+
+        # Individuals i and j are not related
+        return 0
+    
+    def isParent(self, i, j):
+        # Check if individual i is a parent of individual j
+        return self.df.iloc[j]['Father'] == i or self.df.iloc[j]['Mother'] == i
+    
+    def isSibling(self, i, j):
+        # Check if individuals i and j share at least one parent
+        return self.df.iloc[i]['Father'] == self.df.iloc[j]['Father'] or \
+               self.df.iloc[i]['Mother'] == self.df.iloc[j]['Mother']
+
 
     #endregion
 
