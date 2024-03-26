@@ -25,9 +25,9 @@ import sys
 # NewPedigree as methods.
 # import pyp_demog          #NO FUNCTIONS FROM THIS IMPORT ARE EVER USED
 # import pyp_io             #NO FUNCTIONS FROM THIS IMPORT ARE EVER USED
-import pyp_metrics
-import pyp_nrm
-import pyp_utils
+from Assets.PyPedal import pyp_metrics
+from Assets.PyPedal import pyp_nrm
+from Assets.PyPedal import pyp_utils
 
 ##
 # The NewPedigree class is the main data structure for PyP 2.0.0Final.

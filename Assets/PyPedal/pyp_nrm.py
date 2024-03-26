@@ -40,7 +40,7 @@ import copy
 from string import *
 from time import *
 from numpy import *
-from pyp_utils import *
+from Assets.PyPedal import pyp_utils
 
 ##
 # a_matrix() is used to form a numerator relationship matrix from a pedigree.  DEPRECATED.

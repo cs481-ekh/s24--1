@@ -1,1 +1,1 @@
-# This file is REQUIRED for Descent to find PyPedal Files
+# This file is REQUIRED for Pytest to find Testing Files
