@@ -64,6 +64,56 @@ class DataManager:
     
         return self.df
     
+
+    # Validates DataFrame Logic
+    def checkForErrors(self):
+        # Initialize a list to store error messages
+        error_messages = []
+
+        # Check if Father references a male individual
+        errors_father_sex = self.df[(self.df['Father'].isin(self.df['Ego'])) & (self.df['Sex'] != 'Male')]
+        if not errors_father_sex.empty:
+            for ego in errors_father_sex['Ego']:
+                error_messages.append(f"Error for Ego {ego}: Father references a non-male individual.")
+
+        # Check if Mother references a female individual
+        errors_mother_sex = self.df[(self.df['Mother'].isin(self.df['Ego'])) & (self.df['Sex'] != 'Female')]
+        if not errors_mother_sex.empty:
+            for ego in errors_mother_sex['Ego']:
+                error_messages.append(f"Error for Ego {ego}: Mother references a non-female individual.")
+
+        # Check if Father is the same as Ego
+        errors_father_egos = self.df[self.df['Father'] == self.df['Ego']]
+        if not errors_father_egos.empty:
+            for ego in errors_father_egos['Ego']:
+                error_messages.append(f"Error for Ego {ego}: Father is the same as Ego.")
+
+        # Check if Mother is the same as Ego
+        errors_mother_ego = self.df[self.df['Mother'] == self.df['Ego']]
+        if not errors_mother_ego.empty:
+            for ego in errors_mother_ego['Ego']:
+                error_messages.append(f"Error for Ego {ego}: Mother is the same as Ego.")
+        
+        # Check if Sex is valid Character
+        errors_invalid_sex_egos = self.df[self.df['Sex'] != 'M' & self.df['Sex'] != 'F']
+        if not errors_invalid_sex_egos.empty:
+            for ego in errors_invalid_sex_egos['Ego']:
+                error_messages.append(f"Error for Ego {ego}: Sex colunm is an unexpected value.")
+        
+        # Check if Sex is valid Character
+        errors_invalid_sex_egos = self.df[self.df['Living'] != 'Y' & self.df['Living'] != 'N']
+        if not errors_invalid_sex_egos.empty:
+            for ego in errors_invalid_sex_egos['Ego']:
+                error_messages.append(f"Error for Ego {ego}: Living colunm is an unexpected value.")
+
+
+        # Check for other logic errors (if any)
+        # Add additional checks and error messages as needed.
+
+        # Return all error messages
+        return error_messages
+
+
     #region ========== MATH + PyPedal ==========
 
     # Returns a DataFrame of size N x N
