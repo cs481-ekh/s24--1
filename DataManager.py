@@ -71,13 +71,13 @@ class DataManager:
         error_messages = []
 
         # Check if Father references a male individual
-        errors_father_sex = self.df[(self.df['Father'].isin(self.df['Ego'])) & (self.df['Sex'] != 'Male')]
+        errors_father_sex = self.df[(self.df['Father'].isin(self.df['Ego'])) & (self.df['Sex'] != 'M')]
         if not errors_father_sex.empty:
             for ego in errors_father_sex['Ego']:
                 error_messages.append(f"Error for Ego {ego}: Father references a non-male individual.")
 
         # Check if Mother references a female individual
-        errors_mother_sex = self.df[(self.df['Mother'].isin(self.df['Ego'])) & (self.df['Sex'] != 'Female')]
+        errors_mother_sex = self.df[(self.df['Mother'].isin(self.df['Ego'])) & (self.df['Sex'] != 'F')]
         if not errors_mother_sex.empty:
             for ego in errors_mother_sex['Ego']:
                 error_messages.append(f"Error for Ego {ego}: Mother references a non-female individual.")
@@ -95,13 +95,13 @@ class DataManager:
                 error_messages.append(f"Error for Ego {ego}: Mother is the same as Ego.")
         
         # Check if Sex is valid Character
-        errors_invalid_sex_egos = self.df[self.df['Sex'] != 'M' & self.df['Sex'] != 'F']
+        errors_invalid_sex_egos = self.df[(self.df['Sex'] != 'M') & (self.df['Sex'] != 'F')]
         if not errors_invalid_sex_egos.empty:
             for ego in errors_invalid_sex_egos['Ego']:
                 error_messages.append(f"Error for Ego {ego}: Sex colunm is an unexpected value.")
         
         # Check if Sex is valid Character
-        errors_invalid_sex_egos = self.df[self.df['Living'] != 'Y' & self.df['Living'] != 'N']
+        errors_invalid_sex_egos = self.df[(self.df['Living'] != 'Y') & (self.df['Living'] != 'N')]
         if not errors_invalid_sex_egos.empty:
             for ego in errors_invalid_sex_egos['Ego']:
                 error_messages.append(f"Error for Ego {ego}: Living colunm is an unexpected value.")
