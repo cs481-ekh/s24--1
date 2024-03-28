@@ -46,14 +46,15 @@ class DataManager:
         # Data Formatting
         self.df.replace('', None, inplace=True)
 
-        # TODO: Possible Solutions to Error in RMatrix
+        # TODO: Possible Solutions to Error in RMatrix (Ego, Father, Mother must be same Type!)
+
         # self.df['Ego'] = pd.to_numeric(self.df['Ego'], errors='coerce').astype(pd.Int64Dtype())
         # self.df['Father'] = pd.to_numeric(self.df['Father'], errors='coerce').astype(pd.Int64Dtype())
         # self.df['Mother'] = pd.to_numeric(self.df['Mother'], errors='coerce').astype(pd.Int64Dtype())
         # self.df['Ego'] = self.df['Ego'].apply(self.convert_to_int)
         # self.df['Father'] = self.df['Father'].apply(self.convert_to_int)
         # self.df['Mother'] = self.df['Mother'].apply(self.convert_to_int)
-        self.df['Ego'] = self.df['Ego'].astype(int)
+        # self.df['Ego'] = self.df['Ego'].astype(int)
         # self.df['Father'] = self.df['Father'].astype(int)
         # self.df['Mother'] = self.df['Mother'].astype(int)
         self.df['Sex'] = self.df['Sex'].astype(str)
@@ -71,13 +72,15 @@ class DataManager:
         error_messages = []
 
         # Check if Father references a male individual
-        errors_father_sex = self.df[(self.df['Father'].isin(self.df['Ego'])) & (self.df['Sex'] != 'M')]
+        errors_father_sex = self.df[self.df['Father'].isin(self.df['Ego'])]
+        errors_father_sex = errors_father_sex[errors_father_sex['Father'].map(self.df.set_index('Ego')['Sex']) != 'M']
         if not errors_father_sex.empty:
             for ego in errors_father_sex['Ego']:
                 error_messages.append(f"Error for Ego {ego}: Father references a non-male individual.")
 
         # Check if Mother references a female individual
-        errors_mother_sex = self.df[(self.df['Mother'].isin(self.df['Ego'])) & (self.df['Sex'] != 'F')]
+        errors_mother_sex = self.df[self.df['Mother'].isin(self.df['Ego'])]
+        errors_mother_sex = errors_father_sex[errors_father_sex['Mother'].map(self.df.set_index('Ego')['Sex']) != 'F']
         if not errors_mother_sex.empty:
             for ego in errors_mother_sex['Ego']:
                 error_messages.append(f"Error for Ego {ego}: Mother references a non-female individual.")
@@ -107,8 +110,10 @@ class DataManager:
                 error_messages.append(f"Error for Ego {ego}: Living colunm is an unexpected value.")
 
 
-        # Check for other logic errors (if any)
         # Add additional checks and error messages as needed.
+                
+        for line in error_messages:
+            print(line)
 
         # Return all error messages
         return error_messages
