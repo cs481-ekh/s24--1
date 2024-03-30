@@ -45,3 +45,8 @@ def test_get_number_rows(sample_data_manager):
 def test_get_number_cols(sample_data_manager):
     # Test GetNumberCols function to ensure correct number of columns
     assert sample_data_manager.GetNumberCols() == 5
+
+# Test getFounders function
+def test_get_founders(sample_data_manager):
+    # Test getFounders function to ensure founders are found
+    assert sample_data_manager.getFounders() != None

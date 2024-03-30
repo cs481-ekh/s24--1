@@ -1,14 +1,18 @@
 import pandas as pd # Excellent Documentation: https://pandas.pydata.org/docs/reference/frame.html
 import numpy as np
 
+# Math Files
+import Founders
+
 
 class DataManager:
     # Initializes DataManager using Input File Name (../Example.csv)
     def __init__(self, filename):
         try:
             self.data = []
-            self.df = None
-            self.rm = None
+            self.df = None # DataFrame
+            self.rm = None # Relate Matrix DataFrame
+            self.founders = None # Founders DataFrame
 
             if filename.endswith('.csv'): # CSV Only
                 with open(filename, 'r') as f:
@@ -64,7 +68,39 @@ class DataManager:
     
         return self.df
     
+    #region ========== Module Access =========
+
+    # TODO: Relate Here
+
+    # Returns Dataframe of Founders and creates a property with same data
+    # Founders include: No Parents OR Non-existing Parents (Gets Added)
+    def getFounders(self):
+        self.founders = Founders.findFounders(self.df)
+        return self.founders
+    
+    # Returns List[5] of Stats
+    # List Oder: [Founders Count, Max Descendents, Max Living Descendents, Avg Descendents, Avg Living Descendents]
+    def getFoundersStats(self):
+        return Founders.getStats(self.df, self.founders)
+
+
+    # TODO: Lineage Here
+        
+    # TODO: Kin Counter Here
+        
+    # TODO: Kin Here
+        
+    # TODO: Groups Here
+        
+    # TODO: Plot Here
+        
+    # TODO: PCA Here
+
+    #endregion
+
     #region ========== MATH + PyPedal ==========
+
+    
 
     # Returns a DataFrame of size N x N
     # Calculates the relatedness of each individual to each individual

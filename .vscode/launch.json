@@ -26,6 +26,13 @@
             "args": "--i fake_file.csv"
         },
         {
+            "name": "Run CLI w/ Valid",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "main.py",
+            "args": "--i Assets/TestData/ValidTestData.csv"
+        },
+        {
             "name": "Run CLI w/ File",
             "type": "debugpy",
             "request": "launch",
