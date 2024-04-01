@@ -51,7 +51,7 @@ def cli_init(str_list):
                     dataMan.createPandasDataFrame()
 
                     dataMan.getFounders()
-                    print(dataMan.getFoundersStats())
+                    print(dataMan.getFounderStats())
                     # Use to run calculateRMatrix()
                     #temp = dataMan.calculateRMatrix()
                 else:

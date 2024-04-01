@@ -13,6 +13,7 @@ class DataManager:
             self.df = None # DataFrame
             self.rm = None # Relate Matrix DataFrame
             self.founders = None # Founders DataFrame
+            self.founderStats = None # Founders Descendant Stats
 
             if filename.endswith('.csv'): # CSV Only
                 with open(filename, 'r') as f:
@@ -72,17 +73,52 @@ class DataManager:
 
     # TODO: Relate Here
 
+
+    #region ========= Founders =========
+
     # Returns Dataframe of Founders and creates a property with same data
     # Founders include: No Parents OR Non-existing Parents (Gets Added)
     def getFounders(self):
-        self.founders = Founders.findFounders(self.df)
+        self.df, self.founders = Founders.findFounders(self.df)
         return self.founders
     
     # Returns List[5] of Stats
-    # List Oder: [Founders Count, Max Descendents, Max Living Descendents, Avg Descendents, Avg Living Descendents]
-    def getFoundersStats(self):
-        return Founders.getStats(self.df, self.founders)
+    # List Oder: [Founders Count, Max Descendants, Max Living Descendants, Avg Descendants, Avg Living Descendants]
+    def getFounderStats(self):
+        self.founderStats = Founders.getStats(self.df, self.founders)
+        return self.founderStats
+    
+    # Returns Founders Count
+    def getFounderCount(self):
+        if self.founderStats == None:
+            self.founderStats = self.getFoundersStats()
+        return self.founderStats[0]
+    
+    # Returns Max Descendants
+    def getMaxDescendants(self):
+        if self.founderStats == None:
+            self.founderStats = self.getFoundersStats()
+        return self.founderStats[1]
+    
+    # Returns Max Living Descendants
+    def getMaxLivingDescendants(self):
+        if self.founderStats == None:
+            self.founderStats = self.getFoundersStats()
+        return self.founderStats[2]
+    
+    # Returns Average Descendants
+    def getAvgDescendants(self):
+        if self.founderStats == None:
+            self.founderStats = self.getFoundersStats()
+        return self.founderStats[3]
+    
+    # Returns Average Living Descendants
+    def getAvgLivingDescendants(self):
+        if self.founderStats == None:
+            self.founderStats = self.getFoundersStats()
+        return self.founderStats[4]
 
+    #endregion
 
     # TODO: Lineage Here
         

@@ -1,9 +1,10 @@
 import pandas as pd # Excellent Documentation: https://pandas.pydata.org/docs/reference/frame.html
 import numpy as np
+import warnings
 
 
 # Takes in complete dataframe
-# Returns dataframe of Founders (Ego, Father, Mother, Sex, Living)
+# Returns dataframe updated df and a new dataframe of Founders (Ego, Father, Mother, Sex, Living)
 # Missing Mother/Father becomes a Founder
 def findFounders(df):
     # Get all unique Ego IDs, Father IDs, and Mother IDs
@@ -30,7 +31,8 @@ def findFounders(df):
             founders = pd.concat([founders, pd.DataFrame(new_entry)])
             df = pd.concat([df, pd.DataFrame(new_entry)])
             # Update Child to reflect new parent entry
-            df[df['Ego'] == ego]['Father'] = newEgoID
+            warnings.simplefilter('ignore')
+            df[df['Ego'] == ego]['Father'] = newEgoID # TODO: Causes Warning but works!
 
         # If Mother is missing, create a new entry for the Mother
         if mother is None and father is not None:
@@ -41,12 +43,15 @@ def findFounders(df):
             founders = pd.concat([founders, pd.DataFrame(new_entry)])
             df = pd.concat([df, pd.DataFrame(new_entry)])
             # Update Child to reflect new parent entry
-            df[df['Ego'] == ego]['Mother'] = newEgoID
+            warnings.simplefilter('ignore')
+            df[df['Ego'] == ego]['Mother'] = newEgoID # TODO: Causes Warning but works!
 
-    return founders
+    return df, founders
+
 
 # Takes in complete dataframe and Founders DataFrame
 # Returns list of statistics (5 elements)
+# Avg. Rounded to 3rd decimal
 def getStats(df, founders):
     # Order: [Founders Count, Max descendants, Max Living descendants, Avg descendants, Avg Living descendants]
     stats = []
@@ -80,8 +85,8 @@ def getStats(df, founders):
         totalLivDesc += living_descendants_count
 
     # Calculate average descendants and average living descendants
-    avgDesc = totalDesc / len(founders)
-    avgLivDesc = totalLivDesc / len(founders)
+    avgDesc = round(totalDesc / len(founders), 3)
+    avgLivDesc = round(totalLivDesc / len(founders), 3)
 
     # Add stats to the list
     stats.extend([maxDesc, maxLivDesc, avgDesc, avgLivDesc])
@@ -94,11 +99,11 @@ def getStats(df, founders):
 # Returns the number of descendents of Ego
 def getDescCounts(df, ego):
     # Base case: if the founder has no descendants, return 0
-    temp = df[(df['Father'] == ego) | (df['Mother'] == ego)]
-    if not df[(df['Father'] == ego) | (df['Mother'] == ego)].empty:
+    temp = df[(df['Father'] == (str)(ego)) | (df['Mother'] == (str)(ego))]
+    if not df[(df['Father'] == (str)(ego)) | (df['Mother'] == (str)(ego))].empty:
         # Recursive case: count the direct descendants and recursively count descendants of each child
         descendants_count = 0
-        children = df[df['Father'] == ego].append(df[df['Mother'] == ego])
+        children = pd.concat([df[df['Father'] == (str)(ego)], df[df['Mother'] == (str)(ego)]])
         for index, child in children.iterrows():
             descendants_count += 1  # Count the current child
             descendants_count += getDescCounts(df, child['Ego'])  # Recursively count descendants of the child
@@ -112,10 +117,10 @@ def getDescCounts(df, ego):
 # Returns the number of living descendents of Ego
 def getLivDescCounts(df, ego):
     # Base case: if the founder has no descendants, return 0
-    if not df[((df['Father'] == ego) | (df['Mother'] == ego)) & (df['Living'] == 'Y')].empty:
+    if not df[((df['Father'] == (str)(ego)) | (df['Mother'] == (str)(ego))) & (df['Living'] == 'Y')].empty:
         # Recursive case: count the direct living descendants and recursively count living descendants of each child
         living_descendants_count = 0
-        children = df[((df['Father'] == ego) | (df['Mother'] == ego)) & (df['Living'] == 'Y')]
+        children = df[((df['Father'] == (str)(ego)) | (df['Mother'] == (str)(ego))) & (df['Living'] == 'Y')]
         for index, child in children.iterrows():
             living_descendants_count += 1  # Count the current living child
             living_descendants_count += getLivDescCounts(df, child['Ego'])  # Recursively count living descendants of the child
