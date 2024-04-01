@@ -4,50 +4,8 @@ import numpy as np
 
 # Takes in complete dataframe
 # Returns dataframe of Founders (Ego, Father, Mother, Sex, Living)
+# Missing Mother/Father becomes a Founder
 def findFounders(df):
-    # TODO: Incorrect Logic
-    # Creates Missing Parents (They become Founders)
-    # egos = set(df['Ego'])
-    # fathers = set(df['Father'].dropna().astype(int))
-    # mothers = set(df['Mother'].dropna().astype(int))
-
-    # # Finds unlinked parents
-    # unlinkedFathers = egos - fathers
-    # unlinkedMothers = egos - mothers
-
-    # # Creates New Entries for each missing parent
-    # newFounders = []
-    # for f in unlinkedFathers:
-    #     newFounders.append({'Ego': f, 'Father': None, 'Mother': None, 'Sex': 'M', 'Living': None})
-    # for m in unlinkedMothers:
-    #     newFounders.append({'Ego': m, 'Father': None, 'Mother': None, 'Sex': 'F', 'Living': None})
-
-    #set(df['Father'].dropna().astype(int))
-    #set(df['Mother'].dropna().astype(int))
-
-    # egoMissingMother = df[df['Mother'] == None]
-    # egoMissingFather = df[df['Father'] == None]
-
-    # newIndex = (int) (df['Ego'].max() + 1)
-    # newFounders = []
-
-    # for child in egoMissingMother:
-    #     #child['Mother'] = (str) (newIndex)
-    #     newFounders.append({'Ego': newIndex, 'Father': None, 'Mother': None, 'Sex': 'F', 'Living': None})
-    #     newIndex += 1
-
-    # for child in egoMissingFather:
-    #     #child['Father'] = (str) (newIndex)
-    #     newFounders.append({'Ego': newIndex, 'Father': None, 'Mother': None, 'Sex': 'M', 'Living': None})
-    #     newIndex += 1
-    
-    # # Adds the new entries to DataFrame
-    # addedFounders = pd.DataFrame(newFounders)
-    # df = pd.concat([df, addedFounders], ignore_index=True)
-
-    # # Gets Founders
-    # return df[(df['Mother'] == None) & (df['Father'] == None)]
-
     # Get all unique Ego IDs, Father IDs, and Mother IDs
     all_egos = set(df['Ego'])
 
@@ -64,24 +22,26 @@ def findFounders(df):
             temp = df[df['Ego'] == ego]
             founders = pd.concat([founders, temp])
 
-        # If one parent is missing, create a new entry for the missing parent
+        # If Father is missing, create a new entry for the Father
         if father is None and mother is not None:
+            newEgoID = df['Ego'].max() + 1
             # Create a new entry with the missing father
-            new_entry = [{'Ego': None, 'Father': None, 'Mother': None, 'Sex': 'M', 'Living': None}]
+            new_entry = [{'Ego': newEgoID, 'Father': None, 'Mother': None, 'Sex': 'M', 'Living': None}]
             founders = pd.concat([founders, pd.DataFrame(new_entry)])
             df = pd.concat([df, pd.DataFrame(new_entry)])
-            # TODO: Update 'Ego': ego to match new entry as father
-            # TODO: Correct new entry ego
+            # Update Child to reflect new parent entry
+            df[df['Ego'] == ego]['Father'] = newEgoID
 
+        # If Mother is missing, create a new entry for the Mother
         if mother is None and father is not None:
             # Create a new entry with the missing mother
-            new_entry = [{'Ego': None, 'Father': None, 'Mother': None, 'Sex': 'F', 'Living': None}]
+            newEgoID = df['Ego'].max() + 1
+            new_entry = [{'Ego': newEgoID, 'Father': None, 'Mother': None, 'Sex': 'F', 'Living': None}]
+            # Save Parent as Founder and add to df
             founders = pd.concat([founders, pd.DataFrame(new_entry)])
             df = pd.concat([df, pd.DataFrame(new_entry)])
-            # TODO: Update 'Ego': ego to match new entry as mother
-            # TODO: Correct new entry ego
-
-        founders.reset_index()
+            # Update Child to reflect new parent entry
+            df[df['Ego'] == ego]['Mother'] = newEgoID
 
     return founders
 
@@ -134,6 +94,7 @@ def getStats(df, founders):
 # Returns the number of descendents of Ego
 def getDescCounts(df, ego):
     # Base case: if the founder has no descendants, return 0
+    temp = df[(df['Father'] == ego) | (df['Mother'] == ego)]
     if not df[(df['Father'] == ego) | (df['Mother'] == ego)].empty:
         # Recursive case: count the direct descendants and recursively count descendants of each child
         descendants_count = 0
