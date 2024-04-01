@@ -7,28 +7,83 @@ import numpy as np
 def findFounders(df):
     # TODO: Incorrect Logic
     # Creates Missing Parents (They become Founders)
-    egos = set(df['Ego'])
-    fathers = set(df['Father'].dropna().astype(int))
-    mothers = set(df['Mother'].dropna().astype(int))
+    # egos = set(df['Ego'])
+    # fathers = set(df['Father'].dropna().astype(int))
+    # mothers = set(df['Mother'].dropna().astype(int))
 
-    # Finds unlinked parents
-    unlinkedFathers = egos - fathers
-    unlinkedMothers = egos - mothers
+    # # Finds unlinked parents
+    # unlinkedFathers = egos - fathers
+    # unlinkedMothers = egos - mothers
 
-    # Creates New Entries for each missing parent
-    newFounders = []
-    for f in unlinkedFathers:
-        newFounders.append({'Ego': f, 'Father': None, 'Mother': None, 'Sex': 'M', 'Living': None})
-    for m in unlinkedMothers:
-        newFounders.append({'Ego': m, 'Father': None, 'Mother': None, 'Sex': 'F', 'Living': None})
+    # # Creates New Entries for each missing parent
+    # newFounders = []
+    # for f in unlinkedFathers:
+    #     newFounders.append({'Ego': f, 'Father': None, 'Mother': None, 'Sex': 'M', 'Living': None})
+    # for m in unlinkedMothers:
+    #     newFounders.append({'Ego': m, 'Father': None, 'Mother': None, 'Sex': 'F', 'Living': None})
+
+    #set(df['Father'].dropna().astype(int))
+    #set(df['Mother'].dropna().astype(int))
+
+    # egoMissingMother = df[df['Mother'] == None]
+    # egoMissingFather = df[df['Father'] == None]
+
+    # newIndex = (int) (df['Ego'].max() + 1)
+    # newFounders = []
+
+    # for child in egoMissingMother:
+    #     #child['Mother'] = (str) (newIndex)
+    #     newFounders.append({'Ego': newIndex, 'Father': None, 'Mother': None, 'Sex': 'F', 'Living': None})
+    #     newIndex += 1
+
+    # for child in egoMissingFather:
+    #     #child['Father'] = (str) (newIndex)
+    #     newFounders.append({'Ego': newIndex, 'Father': None, 'Mother': None, 'Sex': 'M', 'Living': None})
+    #     newIndex += 1
     
-    # Adds the new entries to DataFrame
-    addedFounders = pd.DataFrame(newFounders)
-    df = pd.concat([df, addedFounders], ignore_index=True)
+    # # Adds the new entries to DataFrame
+    # addedFounders = pd.DataFrame(newFounders)
+    # df = pd.concat([df, addedFounders], ignore_index=True)
 
-    # Gets Founders
-    return df[(df['Mother'] == None) & (df['Father'] == None)]
+    # # Gets Founders
+    # return df[(df['Mother'] == None) & (df['Father'] == None)]
 
+    # Get all unique Ego IDs, Father IDs, and Mother IDs
+    all_egos = set(df['Ego'])
+
+    # Find individuals who have both parents as None or a singular missing parent
+    founders = pd.DataFrame()
+
+    # Iterate over each unique Ego ID
+    for ego in all_egos:
+        father = df.loc[df['Ego'] == ego, 'Father'].iloc[0]
+        mother = df.loc[df['Ego'] == ego, 'Mother'].iloc[0]
+
+        # Check if both parents are None or one parent is missing
+        if (father is None and mother is None):
+            temp = df[df['Ego'] == ego]
+            founders = pd.concat([founders, temp])
+
+        # If one parent is missing, create a new entry for the missing parent
+        if father is None and mother is not None:
+            # Create a new entry with the missing father
+            new_entry = [{'Ego': None, 'Father': None, 'Mother': None, 'Sex': 'M', 'Living': None}]
+            founders = pd.concat([founders, pd.DataFrame(new_entry)])
+            df = pd.concat([df, pd.DataFrame(new_entry)])
+            # TODO: Update 'Ego': ego to match new entry as father
+            # TODO: Correct new entry ego
+
+        if mother is None and father is not None:
+            # Create a new entry with the missing mother
+            new_entry = [{'Ego': None, 'Father': None, 'Mother': None, 'Sex': 'F', 'Living': None}]
+            founders = pd.concat([founders, pd.DataFrame(new_entry)])
+            df = pd.concat([df, pd.DataFrame(new_entry)])
+            # TODO: Update 'Ego': ego to match new entry as mother
+            # TODO: Correct new entry ego
+
+        founders.reset_index()
+
+    return founders
 
 # Takes in complete dataframe and Founders DataFrame
 # Returns list of statistics (5 elements)

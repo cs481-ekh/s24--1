@@ -50,7 +50,7 @@ def cli_init(str_list):
                     dataMan = DataManager(input_filename)
                     dataMan.createPandasDataFrame()
 
-                    dataMan.getFounders()
+                    print(dataMan.getFounders())
                     print(dataMan.getFoundersStats())
                     # Use to run calculateRMatrix()
                     #temp = dataMan.calculateRMatrix()
