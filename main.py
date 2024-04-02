@@ -50,10 +50,10 @@ def cli_init(str_list):
                     dataMan = DataManager(input_filename)
                     dataMan.createPandasDataFrame()
 
+                    dataMan.checkForErrors()
+
                     dataMan.getFounders()
                     print(dataMan.getFounderStats())
-                    # Use to run calculateRMatrix()
-                    #temp = dataMan.calculateRMatrix()
                 else:
                     retVal += f"{input_filename} could not be found and was not opened.\n"
 

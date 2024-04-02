@@ -51,14 +51,15 @@ class DataManager:
         # Data Formatting
         self.df.replace('', None, inplace=True)
 
-        # TODO: Possible Solutions to Error in RMatrix
+        # TODO: Possible Solutions to Error in RMatrix (Ego, Father, Mother must be same Type!)
+
         # self.df['Ego'] = pd.to_numeric(self.df['Ego'], errors='coerce').astype(pd.Int64Dtype())
         # self.df['Father'] = pd.to_numeric(self.df['Father'], errors='coerce').astype(pd.Int64Dtype())
         # self.df['Mother'] = pd.to_numeric(self.df['Mother'], errors='coerce').astype(pd.Int64Dtype())
         # self.df['Ego'] = self.df['Ego'].apply(self.convert_to_int)
         # self.df['Father'] = self.df['Father'].apply(self.convert_to_int)
         # self.df['Mother'] = self.df['Mother'].apply(self.convert_to_int)
-        self.df['Ego'] = self.df['Ego'].astype(int)
+        # self.df['Ego'] = self.df['Ego'].astype(int)
         # self.df['Father'] = self.df['Father'].astype(int)
         # self.df['Mother'] = self.df['Mother'].astype(int)
         self.df['Sex'] = self.df['Sex'].astype(str)
@@ -69,10 +70,61 @@ class DataManager:
     
         return self.df
     
+    # Validates DataFrame Logic
+    def checkForErrors(self):
+        # Initialize a list to store error messages
+        error_messages = []
+
+        # Check if Father references a male individual
+        errors_father_sex = self.df[self.df['Father'].isin(self.df['Ego'])]
+        errors_father_sex = errors_father_sex[errors_father_sex['Father'].map(self.df.set_index('Ego')['Sex']) != 'M']
+        if not errors_father_sex.empty:
+            for ego in errors_father_sex['Ego']:
+                error_messages.append(f"Error for Ego {ego}: Father references a non-male individual.")
+
+        # Check if Mother references a female individual
+        errors_mother_sex = self.df[self.df['Mother'].isin(self.df['Ego'])]
+        errors_mother_sex = errors_father_sex[errors_father_sex['Mother'].map(self.df.set_index('Ego')['Sex']) != 'F']
+        if not errors_mother_sex.empty:
+            for ego in errors_mother_sex['Ego']:
+                error_messages.append(f"Error for Ego {ego}: Mother references a non-female individual.")
+
+        # Check if Father is the same as Ego
+        errors_father_egos = self.df[self.df['Father'] == self.df['Ego']]
+        if not errors_father_egos.empty:
+            for ego in errors_father_egos['Ego']:
+                error_messages.append(f"Error for Ego {ego}: Father is the same as Ego.")
+
+        # Check if Mother is the same as Ego
+        errors_mother_ego = self.df[self.df['Mother'] == self.df['Ego']]
+        if not errors_mother_ego.empty:
+            for ego in errors_mother_ego['Ego']:
+                error_messages.append(f"Error for Ego {ego}: Mother is the same as Ego.")
+        
+        # Check if Sex is valid Character
+        errors_invalid_sex_egos = self.df[(self.df['Sex'] != 'M') & (self.df['Sex'] != 'F')]
+        if not errors_invalid_sex_egos.empty:
+            for ego in errors_invalid_sex_egos['Ego']:
+                error_messages.append(f"Error for Ego {ego}: Sex colunm is an unexpected value.")
+        
+        # Check if Sex is valid Character
+        errors_invalid_sex_egos = self.df[(self.df['Living'] != 'Y') & (self.df['Living'] != 'N')]
+        if not errors_invalid_sex_egos.empty:
+            for ego in errors_invalid_sex_egos['Ego']:
+                error_messages.append(f"Error for Ego {ego}: Living colunm is an unexpected value.")
+
+
+        # Add additional checks and error messages as needed.
+                
+        for line in error_messages:
+            print(line)
+
+        # Return all error messages
+        return error_messages
+
     #region ========== Module Access =========
 
     # TODO: Relate Here
-
 
     #region ========= Founders =========
 

@@ -27,6 +27,17 @@ def valid_data_manager():
     data_manager.createPandasDataFrame()
     return data_manager
 
+#region Validation
+
+# Test IsEmptyCell function
+def test_check_for_errors(sample_data_manager):
+    # Test IsEmptyCell function with known empty and non-empty cells
+    assert sample_data_manager.checkForErrors() != []
+
+#endregion
+
+#region Utils
+
 # Test IsEmptyCell function
 def test_is_empty_cell(sample_data_manager):
     # Test IsEmptyCell function with known empty and non-empty cells
@@ -49,7 +60,9 @@ def test_get_number_cols(sample_data_manager):
     # Test GetNumberCols function to ensure correct number of columns
     assert sample_data_manager.GetNumberCols() == 5
 
-#region ========= Founders =========
+#endregion
+
+#region Founders
     
 # Test getFounders function
 def test_get_founders(valid_data_manager):
