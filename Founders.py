@@ -25,7 +25,7 @@ def findFounders(df):
 
         # If Father is missing, create a new entry for the Father
         if father is None and mother is not None:
-            newEgoID = df['Ego'].max() + 1
+            newEgoID = (str)((int)(df['Ego'].max()) + 1)
             # Create a new entry with the missing father
             new_entry = [{'Ego': newEgoID, 'Father': None, 'Mother': None, 'Sex': 'M', 'Living': None}]
             founders = pd.concat([founders, pd.DataFrame(new_entry)])
@@ -37,7 +37,7 @@ def findFounders(df):
         # If Mother is missing, create a new entry for the Mother
         if mother is None and father is not None:
             # Create a new entry with the missing mother
-            newEgoID = df['Ego'].max() + 1
+            newEgoID = (str)((int)(df['Ego'].max()) + 1)
             new_entry = [{'Ego': newEgoID, 'Father': None, 'Mother': None, 'Sex': 'F', 'Living': None}]
             # Save Parent as Founder and add to df
             founders = pd.concat([founders, pd.DataFrame(new_entry)])
