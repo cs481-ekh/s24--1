@@ -49,6 +49,7 @@ def cli_init(str_list):
                     global dataMan
                     dataMan = DataManager(input_filename)
                     dataMan.createPandasDataFrame()
+                    dataMan.checkForErrors()
                     # Use to run calculateRMatrix()
                     #temp = dataMan.calculateRMatrix()
                 else:
