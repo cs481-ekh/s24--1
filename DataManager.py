@@ -27,11 +27,12 @@ class DataManager:
             print("There was a problem Initializing the DataManager")
     
     # Packs data into Pandas DataFrame Object
-    # Requires Self
-            # Column Names to select (Order Matters; Ego, Father, Mother, Sex, Living)
-            # Expected Values (Order Matters; Male, Female, Living, Dead, Missing Value)
+    # Requires 
+            # Self for data input
+            # Column Names from input file to select (Order Matters; Ego, Father, Mother, Sex, Living)
+            # Expected Values from input file (Order Matters; Male, Female, Living, Dead, Missing Value)
             # Remove Header (First row is column names)
-    def createPandasDataFrame(self, columns=['Ego', 'Father', 'Mother', 'Sex', 'Living'], values=['M', 'F', 'Y', 'N', '9999'], removeHeader=True):
+    def createPandasDataFrame(self, columns=['Ego', 'Father', 'Mother', 'Sex', 'Living'], values=['M', 'F', 'Y', 'N', ''], removeHeader=True):
         if self.data is None:
             print("You can't create the DataFrame: Data is None")
             return
@@ -46,7 +47,7 @@ class DataManager:
         # Puts Data into DataFrame
         self.df = pd.DataFrame(self.data, columns=column_names)
 
-        # Replace input values to Standard (Sex: M/F, Living: Y/N, Missing: None)
+        # Replace input values to internal Standard (Sex: M/F, Living: Y/N, Missing: None)
         self.df.replace(values[0], 'M', inplace=True)
         self.df.replace(values[1], 'F', inplace=True)
         self.df.replace(values[2], 'Y', inplace=True)
@@ -56,7 +57,7 @@ class DataManager:
         # Filters out all columns except: Ego, Father, Mother, Sex, Living
         self.df = self.df[[columns[0], columns[1], columns[2], columns[3], columns[4]]]
 
-        # Change Column Names to Standard (Ego, Father, Mother, Sex, Living)
+        # Change Column Names to internal Standard (Ego, Father, Mother, Sex, Living)
         self.df = self.df.rename(columns={columns[0]: 'Ego', \
                                           columns[1]: 'Father', \
                                           columns[2]: 'Mother', \
