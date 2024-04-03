@@ -48,7 +48,9 @@ def cli_init(str_list):
                 if os.path.isfile(input_filename):
                     global dataMan
                     dataMan = DataManager(input_filename)
-                    dataMan.createPandasDataFrame()
+                    dataMan.createPandasDataFrame(columns=['PersonID', 'FatherID', 'MotherID', 'Sex', 'Deceased'], \
+                                                  values=['Male', 'Female', 'FALSE', 'TRUE', '9999'], \
+                                                  removeHeader=True)
 
                     dataMan.checkForErrors()
 
