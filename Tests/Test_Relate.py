@@ -33,3 +33,12 @@ def test_no_crash(valid_data_manager):
 
 def test_father_relatedness(valid_data_manager):
     assert valid_data_manager.calculateRelatedness(3, 1, set()) == 0.5
+
+def test_mother_relatedness(valid_data_manager):
+    assert valid_data_manager.calculateRelatedness(3, 2, set()) == 0.5
+
+def test_sibling_relatedness(valid_data_manager):
+    assert valid_data_manager.calculateRelatedness(3, 4, set()) == 0.25
+
+def test_grandparent_relatedness(valid_data_manager):
+    assert valid_data_manager.calculateRelatedness(6, 1, set()) == 0.25
