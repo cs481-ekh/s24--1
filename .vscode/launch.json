@@ -39,5 +39,12 @@
             "program": "main.py",
             "args": "--i Assets/TestData/HomemadeTestSet.csv"
         }
+        {
+            "name": "Run CLI w/ Ziker File",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "main.py",
+            "args": "--i Assets/TestData/ZikerInputFile.csv"
+        }
     ]
 }

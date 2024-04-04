@@ -27,29 +27,42 @@ class DataManager:
             print("There was a problem Initializing the DataManager")
     
     # Packs data into Pandas DataFrame Object
-    # Requires Data and Alternate Column Order if applicable
-    def createPandasDataFrame(self, columnOrder=['Ego', 'Father', 'Mother', 'Sex', 'Living']):
+    # Requires 
+            # Self for data input
+            # Column Names from input file to select (Order Matters; Ego, Father, Mother, Sex, Living)
+            # Expected Values from input file (Order Matters; Male, Female, Living, Dead, Missing Value)
+            # Remove Header (First row is column names)
+    def createPandasDataFrame(self, columns=['Ego', 'Father', 'Mother', 'Sex', 'Living'], values=['M', 'F', 'Y', 'N', ''], removeHeader=True):
         if self.data is None:
             print("You can't create the DataFrame: Data is None")
             return
 
         num_columns = len(self.data[0])
+        column_names = self.data[0]
 
         # Removes first row if it is header
-        if not self.data[0][0].isnumeric():
+        if removeHeader:
             del self.data[0]
-
-        # Updtates Column Order as needed
-        if columnOrder:
-            column_names = columnOrder
-        else:
-            column_names = [f'Column{i+1}' for i in range(num_columns)]
         
         # Puts Data into DataFrame
         self.df = pd.DataFrame(self.data, columns=column_names)
 
-        # Data Formatting
-        self.df.replace('', None, inplace=True)
+        # Replace input values to internal Standard (Sex: M/F, Living: Y/N, Missing: None)
+        self.df.replace(values[0], 'M', inplace=True)
+        self.df.replace(values[1], 'F', inplace=True)
+        self.df.replace(values[2], 'Y', inplace=True)
+        self.df.replace(values[3], 'N', inplace=True)
+        self.df.replace(values[4], None, inplace=True)
+
+        # Filters out all columns except: Ego, Father, Mother, Sex, Living
+        self.df = self.df[[columns[0], columns[1], columns[2], columns[3], columns[4]]]
+
+        # Change Column Names to internal Standard (Ego, Father, Mother, Sex, Living)
+        self.df = self.df.rename(columns={columns[0]: 'Ego', \
+                                          columns[1]: 'Father', \
+                                          columns[2]: 'Mother', \
+                                          columns[3]: 'Sex', \
+                                          columns[4]: 'Living' })
 
         # TODO: Possible Solutions to Error in RMatrix (Ego, Father, Mother must be same Type!)
 
@@ -65,12 +78,10 @@ class DataManager:
         self.df['Sex'] = self.df['Sex'].astype(str)
         self.df['Living'] = self.df['Living'].astype(str)
 
-        
-
-    
         return self.df
     
     # Validates DataFrame Logic
+    # TODO: Create Incest Warnings
     def checkForErrors(self):
         # Initialize a list to store error messages
         error_messages = []
