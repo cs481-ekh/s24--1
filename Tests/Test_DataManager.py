@@ -36,8 +36,8 @@ def valid_data_manager():
 #region Validation
 
 # Test checkForErrors function
-def test_check_for_errors(sample_data_manager):
-    assert len(sample_data_manager.checkForErrors()) == 0
+def test_check_for_errors(valid_data_manager):
+    assert len(valid_data_manager.checkForErrors()) == 0
 
 #endregion
 
@@ -48,12 +48,6 @@ def test_is_empty_cell(sample_data_manager):
     # Test IsEmptyCell function with known empty and non-empty cells
     assert sample_data_manager.IsEmptyCell(0, 'Ego') == False  # Non-empty cell
     assert sample_data_manager.IsEmptyCell(0, 'Father') == True   # Empty cell
-
-# Test GetValueUsingColName function
-def test_get_value(sample_data_manager):
-    # Test GetValue function to ensure correct value retrieval
-    assert sample_data_manager.GetValue(0, 'Ego') == '1'
-    assert sample_data_manager.GetValue(0, 'Father') == None           # Empty cell
 
 # Test GetNumberRows function
 def test_get_number_rows(sample_data_manager):

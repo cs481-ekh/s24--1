@@ -287,22 +287,10 @@ class DataManager:
     def GetNumberCols(self):
         return len(self.df.columns)
     
-    # Returns value of single cell
-    # Row is Index, Column is ColumnName (Ego, Father, Mother, ...)
-        # df.iat is a possible alternative?
-    def GetValue(self, row, col):
-        try:
-            ret = str(self.df.at[row, col])
-            if ret == 'None':
-                return None
-            return ret
-        except IndexError:
-            return None
-    
     # Returns T/F if single value is ''
     # Row is Index, Column is ColumnName (Ego, Father, Mother, ...)
     def IsEmptyCell(self, row, col):
-        return self.GetValue(row, col) == None
+        return not self.df.iloc[row][col] == self.df.iloc[row][col]
     
     # Returns a single row from data
     def GetLine(self, index):
