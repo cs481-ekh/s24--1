@@ -68,7 +68,7 @@ def getStats(df, founders):
     for index, founder in founders.iterrows():
         # Calculate descendants count for each founder
         descendants_count = getDescCounts(df, founder['Ego'])
-
+        
         # Calculate living descendants count for each founder
         living_descendants_count = getLivDescCounts(df, founder['Ego'])
 
@@ -100,7 +100,7 @@ def getStats(df, founders):
 def getDescCounts(df, ego):
     # Base case: if the founder has no descendants, return 0
     temp = df[(df['Father'] == ego) | (df['Mother'] == ego)]
-    if not df[(df['Father'] == ego) | (df['Mother'] == ego)].empty:
+    if not temp.empty:
         # Recursive case: count the direct descendants and recursively count descendants of each child
         descendants_count = 0
         children = pd.concat([df[df['Father'] == ego], df[df['Mother'] == ego]])
