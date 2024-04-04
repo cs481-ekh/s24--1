@@ -37,7 +37,7 @@ def valid_data_manager():
 
 # Test checkForErrors function
 def test_check_for_errors(sample_data_manager):
-    assert sample_data_manager.checkForErrors() != []
+    assert len(sample_data_manager.checkForErrors()) == 0
 
 #endregion
 
