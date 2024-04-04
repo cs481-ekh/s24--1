@@ -234,15 +234,16 @@ class DataManager:
         if self.isParent(i, j) or self.isParent(j, i):
             return 0.5  # Relatedness to a parent
         
-        print(f"{i} {j}: {self.df[self.df['Ego'] == i]}\n")
         # Check if individuals i and j share a sibling
         if self.isSibling(i, j):
             return 0.25  # Relatedness to a sibling
         
+        print(f"{i} {j}\n{self.df}")
         # Check if individuals i and j are distantly related through common ancestors
-        for parent_i in [self.df.iloc[i]['Father'], self.df.iloc[i]['Mother']]:
+        print([self.df[self.df['Ego'] == i]['Father'], [self.df['Ego'] == i]['Mother']])
+        for parent_i in [self.df[self.df['Ego'] == i]['Father'], [self.df['Ego'] == i]['Mother']]:
             if pd.notnull(parent_i):
-                for parent_j in [self.df.iloc[j]['Father'], self.df.iloc[j]['Mother']]:
+                for parent_j in [self.df[self.df['Ego'] == j]['Father'], self.df[self.df['Ego'] == j]['Mother']]:
                     if pd.notnull(parent_j):
                         relatedness = self.calculateRelatedness(parent_i, parent_j, visited)
                         if relatedness > 0:
@@ -254,12 +255,12 @@ class DataManager:
     
     def isParent(self, i, j):
         # Check if individual i is a parent of individual j
-        return self.df.iloc[j]['Father'] == i or self.df.iloc[j]['Mother'] == i
+        return self.df[self.df['Ego'] == j]['Father'].iloc[0] == i or self.df[self.df['Ego'] == j]['Mother'].iloc[0] == i
     
     def isSibling(self, i, j):
         # Check if individuals i and j share at least one parent
-        return self.df.iloc[i]['Father'] == self.df.iloc[j]['Father'] or \
-               self.df.iloc[i]['Mother'] == self.df.iloc[j]['Mother']
+        return self.df[self.df['Ego'] == i]['Father'].iloc[0] == self.df[self.df['Ego'] == j]['Father'].iloc[0] or \
+               self.df[self.df['Ego'] == i]['Mother'].iloc[0] == self.df[self.df['Ego'] == j]['Mother'].iloc[0]
 
 
     #endregion
