@@ -8,7 +8,7 @@ import warnings
 # Missing Mother/Father becomes a Founder
 def findFounders(df):
     # Get all unique Ego IDs, Father IDs, and Mother IDs
-    all_egos = set(df['Ego'])
+    all_egos = df['Ego'].unique()
 
     # Find individuals who have both parents as None or a singular missing parent
     founders = pd.DataFrame()
@@ -19,15 +19,15 @@ def findFounders(df):
         mother = df.loc[df['Ego'] == ego, 'Mother'].iloc[0]
 
         # Check if both parents are None or one parent is missing
-        if (father is None and mother is None):
+        if (np.isnan(father) and np.isnan(mother)):
             temp = df[df['Ego'] == ego]
             founders = pd.concat([founders, temp])
 
         # If Father is missing, create a new entry for the Father
-        if father is None and mother is not None:
+        if np.isnan(father) and not np.isnan(mother):
             newEgoID = (int)(df['Ego'].max()) + 1
             # Create a new entry with the missing father
-            new_entry = [{'Ego': newEgoID, 'Father': None, 'Mother': None, 'Sex': 'M', 'Living': None}]
+            new_entry = [{'Ego': newEgoID, 'Father': np.nan, 'Mother': np.nan, 'Sex': 'M', 'Living': None}]
             founders = pd.concat([founders, pd.DataFrame(new_entry)])
             df = pd.concat([df, pd.DataFrame(new_entry)])
             # Update Child to reflect new parent entry
@@ -35,10 +35,10 @@ def findFounders(df):
             df[df['Ego'] == ego]['Father'] = newEgoID # TODO: Causes Warning but works!
 
         # If Mother is missing, create a new entry for the Mother
-        if mother is None and father is not None:
+        if np.isnan(mother) and not np.isnan(father):
             # Create a new entry with the missing mother
             newEgoID = (int)(df['Ego'].max()) + 1
-            new_entry = [{'Ego': newEgoID, 'Father': None, 'Mother': None, 'Sex': 'F', 'Living': None}]
+            new_entry = [{'Ego': newEgoID, 'Father': np.nan, 'Mother': np.nan, 'Sex': 'F', 'Living': None}]
             # Save Parent as Founder and add to df
             founders = pd.concat([founders, pd.DataFrame(new_entry)])
             df = pd.concat([df, pd.DataFrame(new_entry)])
