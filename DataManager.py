@@ -240,10 +240,10 @@ class DataManager:
         
         print(f"{i} {j}\n{self.df}")
         # Check if individuals i and j are distantly related through common ancestors
-        print([self.df[self.df['Ego'] == i]['Father'], [self.df['Ego'] == i]['Mother']])
-        for parent_i in [self.df[self.df['Ego'] == i]['Father'], [self.df['Ego'] == i]['Mother']]:
+        print(f"Test:\n{type(self.df[self.df['Ego'] == i]['Mother'].iloc[0])}")
+        for parent_i in [self.df[self.df['Ego'] == i]['Father'].iloc[0], [self.df['Ego'] == i]['Mother'].iloc[0]]:
             if pd.notnull(parent_i):
-                for parent_j in [self.df[self.df['Ego'] == j]['Father'], self.df[self.df['Ego'] == j]['Mother']]:
+                for parent_j in [self.df[self.df['Ego'] == j]['Father'].iloc[0], self.df[self.df['Ego'] == j]['Mother'].iloc[0]]:
                     if pd.notnull(parent_j):
                         relatedness = self.calculateRelatedness(parent_i, parent_j, visited)
                         if relatedness > 0:
