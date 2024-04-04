@@ -2,6 +2,29 @@ import pytest
 import numpy
 import DataManager
 
+# Fixture to create a sample DataManager instance to use in multiple tests
+@pytest.fixture
+def sample_data_manager():
+    # Create a sample DataManager instance with a CSV file
+    sample_file = 'Assets/TestData/HomemadeTestSet.csv'
+    data_manager = DataManager.DataManager(sample_file)
+    data_manager.createPandasDataFrame(columns=['ID', 'FatherID', 'MotherID', 'Sex', 'Living'], \
+                                       values=['M', 'F', 'Y', 'N', ''], \
+                                       removeHeader=True)
+    return data_manager
+
+# Fixture to create a sample DataManager instance to use in multiple tests
+# Uses Small Valid File
+@pytest.fixture
+def valid_data_manager():
+    # Create a sample DataManager instance with a CSV file
+    sample_file = 'Assets/TestData/ValidTestData.csv'
+    data_manager = DataManager.DataManager(sample_file)
+    data_manager.createPandasDataFrame(columns=['ID', 'FatherID', 'MotherID', 'Sex', 'Living'], \
+                                       values=['M', 'F', 'Y', 'N', ''], \
+                                       removeHeader=True)
+    return data_manager
+
 #region Founders
     
 # Test getFounders function

@@ -35,9 +35,8 @@ def valid_data_manager():
 
 #region Validation
 
-# Test IsEmptyCell function
+# Test checkForErrors function
 def test_check_for_errors(sample_data_manager):
-    # Test IsEmptyCell function with known empty and non-empty cells
     assert sample_data_manager.checkForErrors() != []
 
 #endregion
