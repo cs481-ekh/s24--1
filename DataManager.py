@@ -63,6 +63,7 @@ class DataManager:
                                           columns[2]: 'Mother', \
                                           columns[3]: 'Sex', \
                                           columns[4]: 'Living' })
+        self.df = self.df.set_index('Ego')
 
         # TODO: Possible Solutions to Error in RMatrix (Ego, Father, Mother must be same Type!)
 
@@ -87,41 +88,41 @@ class DataManager:
         error_messages = []
 
         # Check if Father references a male individual
-        errors_father_sex = self.df[self.df['Father'].isin(self.df['Ego'])]
-        errors_father_sex = errors_father_sex[errors_father_sex['Father'].map(self.df.set_index('Ego')['Sex']) != 'M']
+        errors_father_sex = self.df.loc[np.delete(self.df['Father'].unique(), self.df['Father'].unique()==None)]
+        errors_father_sex = errors_father_sex[errors_father_sex['Sex'] != 'M']
         if not errors_father_sex.empty:
-            for ego in errors_father_sex['Ego']:
+            for ego in errors_father_sex.index:
                 error_messages.append(f"Error for Ego {ego}: Father references a non-male individual.")
 
         # Check if Mother references a female individual
-        errors_mother_sex = self.df[self.df['Mother'].isin(self.df['Ego'])]
-        errors_mother_sex = errors_father_sex[errors_father_sex['Mother'].map(self.df.set_index('Ego')['Sex']) != 'F']
+        errors_mother_sex = self.df.loc[np.delete(self.df['Mother'].unique(), self.df['Mother'].unique()==None)]
+        errors_mother_sex = errors_mother_sex[errors_mother_sex['Sex'] != 'F']
         if not errors_mother_sex.empty:
-            for ego in errors_mother_sex['Ego']:
-                error_messages.append(f"Error for Ego {ego}: Mother references a non-female individual.")
+            for ego in errors_mother_sex.index:
+                error_messages.append(f"Error for Ego {ego}: Mother references a non-male individual.")
 
         # Check if Father is the same as Ego
-        errors_father_egos = self.df[self.df['Father'] == self.df['Ego']]
+        errors_father_egos = self.df[self.df['Father'] == self.df.index]
         if not errors_father_egos.empty:
-            for ego in errors_father_egos['Ego']:
+            for ego in errors_father_egos.index:
                 error_messages.append(f"Error for Ego {ego}: Father is the same as Ego.")
 
         # Check if Mother is the same as Ego
-        errors_mother_ego = self.df[self.df['Mother'] == self.df['Ego']]
+        errors_mother_ego = self.df[self.df['Mother'] == self.df.index]
         if not errors_mother_ego.empty:
-            for ego in errors_mother_ego['Ego']:
+            for ego in errors_mother_ego.index:
                 error_messages.append(f"Error for Ego {ego}: Mother is the same as Ego.")
         
         # Check if Sex is valid Character
         errors_invalid_sex_egos = self.df[(self.df['Sex'] != 'M') & (self.df['Sex'] != 'F')]
         if not errors_invalid_sex_egos.empty:
-            for ego in errors_invalid_sex_egos['Ego']:
+            for ego in errors_invalid_sex_egos.index:
                 error_messages.append(f"Error for Ego {ego}: Sex colunm is an unexpected value.")
         
         # Check if Sex is valid Character
         errors_invalid_sex_egos = self.df[(self.df['Living'] != 'Y') & (self.df['Living'] != 'N')]
         if not errors_invalid_sex_egos.empty:
-            for ego in errors_invalid_sex_egos['Ego']:
+            for ego in errors_invalid_sex_egos.index:
                 error_messages.append(f"Error for Ego {ego}: Living colunm is an unexpected value.")
 
 

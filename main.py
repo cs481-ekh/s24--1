@@ -74,6 +74,9 @@ def cli_init(str_list):
                 select_out_option(str_list[v + 1])
     return retVal
 
+if len(sys.argv) < 2:
+    print_usage()
+
 print(cli_init(sys.argv))
 if gui_enable:
     print(f"GUI flag enabled, starting GUI...", file=sys.stderr)
