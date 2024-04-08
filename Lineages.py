@@ -32,7 +32,7 @@ def findPatLineage(df, ego):
     if ego == None:
         return [], None
     else:
-        father_id = df.loc[(df['Ego'] == ego), 'Father'].item()
+        father_id = df[(df['Ego'] == ego), 'Father']
         lineage, founder = findPatLineage(df, father_id)
         lineage.append(ego)
         if founder is None:
