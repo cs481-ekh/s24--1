@@ -25,26 +25,38 @@ def findLineages(df):
     lineages['Mat. Size'] = df['Ego'].map(lambda x: len(matrilineage[x]))
 
     # Add columns for paternal and maternal founders
-    lineages['Patrilineage'], lineages['Patriarch'] = df['Ego'].map(lambda x: paternal_founders[x])
-    lineages['Matrilineage'], lineages['Matriarch'] = df['Ego'].map(lambda x: maternal_founders[x])
+    lineages['Patrilineage'] = lineages['Ego'].map(lambda x: patrilineage[x])
+    lineages['Patriarch'] = lineages['Ego'].map(lambda x: paternal_founders[x])
+    lineages['Matrilineage'] = lineages['Ego'].map(lambda x: matrilineage[x])
+    lineages['Matriarch'] = lineages['Ego'].map(lambda x: maternal_founders[x])
+
+    return lineages
 
 def findPatLineage(df, ego):
-    if ego == None:
+    if np.isnan(ego):
         return [], None
     else:
-        father_id = df[(df['Ego'] == ego), 'Father']
-        lineage, founder = findPatLineage(df, father_id)
+        temp = df[df['Ego'] == ego]['Father'].values[0]
+        if not np.isnan(temp):
+            father_id = (int)(temp)
+            lineage, founder = findPatLineage(df, father_id)
+        else:
+            lineage, founder = findPatLineage(df, temp)
         lineage.append(ego)
         if founder is None:
             founder = ego
         return lineage, founder
 
 def findMatLineage(df, ego):
-    if ego == 0:
+    if np.isnan(ego):
         return [], None
     else:
-        mother_id = df.loc[ego, 'Mother']
-        lineage, founder = findMatLineage(df, mother_id)
+        temp = df[df['Ego'] == ego]['Mother'].values[0]
+        if not np.isnan(temp):
+            mother_id = (int)(temp)
+            lineage, founder = findPatLineage(df, mother_id)
+        else:
+            lineage, founder = findPatLineage(df, temp)
         lineage.append(ego)
         if founder is None:
             founder = ego

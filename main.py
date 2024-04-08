@@ -54,7 +54,9 @@ def cli_init(str_list):
 
                     dataMan.checkForErrors()
 
-                    dataMan.getLineages()
+                    # Example Uses
+                    #print(dataMan.getFounders())
+                    #print(dataMan.getLineages())
                 else:
                     retVal += f"{input_filename} could not be found and was not opened.\n"
 
