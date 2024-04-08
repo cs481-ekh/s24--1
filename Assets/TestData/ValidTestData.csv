@@ -8,7 +8,7 @@ ID,FatherID,MotherID,Sex,Living
 7,3,,M,Y
 8,7,6,F,Y
 9,1,4,M,Y
-10,8,,F,Y
+10,,8,F,Y
 11,,,M,Y
 12,,,F,Y
 13,5,2,M,Y

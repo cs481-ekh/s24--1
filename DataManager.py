@@ -246,9 +246,9 @@ class DataManager:
             return 0.25  # Relatedness to a sibling
         
         # Check if individuals i and j are distantly related through common ancestors
-        for parent_i in [self.df.iloc[i]['Father'], self.df.iloc[i]['Mother']]:
+        for parent_i in [self.df[self.df['Ego'] == i]['Father'].iloc[0], self.df[self.df['Ego'] == i]['Mother'].iloc[0]]:
             if pd.notnull(parent_i):
-                for parent_j in [self.df.iloc[j]['Father'], self.df.iloc[j]['Mother']]:
+                for parent_j in [self.df[self.df['Ego'] == j]['Father'].iloc[0], self.df[self.df['Ego'] == j]['Mother'].iloc[0]]:
                     if pd.notnull(parent_j):
                         relatedness = self.calculateRelatedness(parent_i, parent_j, visited)
                         if relatedness > 0:
@@ -260,12 +260,12 @@ class DataManager:
     
     def isParent(self, i, j):
         # Check if individual i is a parent of individual j
-        return self.df.iloc[j]['Father'] == i or self.df.iloc[j]['Mother'] == i
+        return self.df[self.df['Ego'] == j]['Father'].iloc[0] == i or self.df[self.df['Ego'] == j]['Mother'].iloc[0] == i
     
     def isSibling(self, i, j):
         # Check if individuals i and j share at least one parent
-        return self.df.iloc[i]['Father'] == self.df.iloc[j]['Father'] or \
-               self.df.iloc[i]['Mother'] == self.df.iloc[j]['Mother']
+        return self.df[self.df['Ego'] == i]['Father'].iloc[0] == self.df[self.df['Ego'] == j]['Father'].iloc[0] or \
+               self.df[self.df['Ego'] == i]['Mother'].iloc[0] == self.df[self.df['Ego'] == j]['Mother'].iloc[0]
 
 
     #endregion
@@ -292,22 +292,10 @@ class DataManager:
     def GetNumberCols(self):
         return len(self.df.columns)
     
-    # Returns value of single cell
-    # Row is Index, Column is ColumnName (Ego, Father, Mother, ...)
-        # df.iat is a possible alternative?
-    def GetValue(self, row, col):
-        try:
-            ret = str(self.df.at[row, col])
-            if ret == 'None':
-                return None
-            return ret
-        except IndexError:
-            return None
-    
     # Returns T/F if single value is ''
     # Row is Index, Column is ColumnName (Ego, Father, Mother, ...)
     def IsEmptyCell(self, row, col):
-        return self.GetValue(row, col) == None
+        return not self.df.iloc[row][col] == self.df.iloc[row][col]
     
     # Returns a single row from data
     def GetLine(self, index):
