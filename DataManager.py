@@ -3,6 +3,7 @@ import numpy as np
 
 # Math Files
 import Founders
+import Lineages
 
 
 class DataManager:
@@ -66,15 +67,10 @@ class DataManager:
 
         # TODO: Possible Solutions to Error in RMatrix (Ego, Father, Mother must be same Type!)
 
-        # self.df['Ego'] = pd.to_numeric(self.df['Ego'], errors='coerce').astype(pd.Int64Dtype())
-        # self.df['Father'] = pd.to_numeric(self.df['Father'], errors='coerce').astype(pd.Int64Dtype())
-        # self.df['Mother'] = pd.to_numeric(self.df['Mother'], errors='coerce').astype(pd.Int64Dtype())
-        # self.df['Ego'] = self.df['Ego'].apply(self.convert_to_int)
-        # self.df['Father'] = self.df['Father'].apply(self.convert_to_int)
-        # self.df['Mother'] = self.df['Mother'].apply(self.convert_to_int)
-        # self.df['Ego'] = self.df['Ego'].astype(int)
-        # self.df['Father'] = self.df['Father'].astype(int)
-        # self.df['Mother'] = self.df['Mother'].astype(int)
+        self.df['Ego'] = pd.to_numeric(self.df['Ego'], errors='coerce', downcast='integer')
+        self.df['Father'] = pd.to_numeric(self.df['Father'], errors='coerce', downcast='integer')
+        self.df['Mother'] = pd.to_numeric(self.df['Mother'], errors='coerce', downcast='integer')
+        
         self.df['Sex'] = self.df['Sex'].astype(str)
         self.df['Living'] = self.df['Living'].astype(str)
 
@@ -183,7 +179,13 @@ class DataManager:
 
     #endregion
 
-    # TODO: Lineage Here
+    #region ========= Lineages =========
+
+    def getLineages(self):
+        self.lineages = Lineages.findLineages(self.df)
+        return self.lineages
+
+    #endregion
         
     # TODO: Kin Counter Here
         
