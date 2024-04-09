@@ -56,7 +56,7 @@ def cli_init(str_list):
 
                     # Example Uses
                     #print(dataMan.getFounders())
-                    #print(dataMan.getLineages())
+                    print(dataMan.getLineages())
                 else:
                     retVal += f"{input_filename} could not be found and was not opened.\n"
 
