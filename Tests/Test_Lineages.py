@@ -35,7 +35,7 @@ def test_get_lineages(ziker_data_manager):
     #                                                           'Patriarch': 2043, \
     #                                                           'Matrilineage': {2414, 722, 39, 42}, \
     #                                                           'Matriarch': 2414}).set_index('Ego', inplace=True)
-    # Ego 2 (Problem with Patrilineage & Matrilineage Formatting)
+    # Ego 2
     assert lineages[lineages['Ego'] == 2].set_index('Ego', inplace=True) == pd.DataFrame({'Ego': 2, \
                                                               'Pat. Size': 3, \
                                                               'Mat. Size': 3, \

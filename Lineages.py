@@ -32,32 +32,46 @@ def findLineages(df):
 
     return lineages
 
+# Recursively Finds Father(s) and returns list for each with founder
 def findPatLineage(df, ego):
+    # Base Case (Ego is Founder)
     if np.isnan(ego):
         return [], None
     else:
+        # Gets Father (potentially nan)
         temp = df[df['Ego'] == ego]['Father'].values[0]
+        # Converts to int if not nan
+        # Recursively calls
         if not np.isnan(temp):
             father_id = (int)(temp)
             lineage, founder = findPatLineage(df, father_id)
         else:
             lineage, founder = findPatLineage(df, temp)
+        # adds ego to lineage list
         lineage.append(ego)
+        # sets founder
         if founder is None:
             founder = ego
         return lineage, founder
 
+# Recursively Finds Mother(s) and returns list for each with founder
 def findMatLineage(df, ego):
+    # Base Case (Ego is Founder)
     if np.isnan(ego):
         return [], None
     else:
+        # Gets Mother (potentially nan)
         temp = df[df['Ego'] == ego]['Mother'].values[0]
+        # Converts to int if not nan
+        # Recursively calls
         if not np.isnan(temp):
             mother_id = (int)(temp)
             lineage, founder = findPatLineage(df, mother_id)
         else:
             lineage, founder = findPatLineage(df, temp)
+        # adds ego to lineage list
         lineage.append(ego)
+        # sets founder
         if founder is None:
             founder = ego
         return lineage, founder
