@@ -8,7 +8,7 @@ import warnings
 # Missing Mother/Father becomes a Founder
 def findFounders(df):
     # Get all unique Ego IDs, Father IDs, and Mother IDs
-    all_egos = set(df['Ego'])
+    all_egos = df['Ego'].unique()
 
     # Find individuals who have both parents as None or a singular missing parent
     founders = pd.DataFrame()
@@ -19,15 +19,15 @@ def findFounders(df):
         mother = df.loc[df['Ego'] == ego, 'Mother'].iloc[0]
 
         # Check if both parents are None or one parent is missing
-        if (father is None and mother is None):
+        if (np.isnan(father) and np.isnan(mother)):
             temp = df[df['Ego'] == ego]
             founders = pd.concat([founders, temp])
 
         # If Father is missing, create a new entry for the Father
-        if father is None and mother is not None:
-            newEgoID = (str)((int)(df['Ego'].max()) + 1)
+        if np.isnan(father) and not np.isnan(mother):
+            newEgoID = (int)(df['Ego'].max()) + 1
             # Create a new entry with the missing father
-            new_entry = [{'Ego': newEgoID, 'Father': None, 'Mother': None, 'Sex': 'M', 'Living': None}]
+            new_entry = [{'Ego': newEgoID, 'Father': np.nan, 'Mother': np.nan, 'Sex': 'M', 'Living': None}]
             founders = pd.concat([founders, pd.DataFrame(new_entry)])
             df = pd.concat([df, pd.DataFrame(new_entry)])
             # Update Child to reflect new parent entry
@@ -35,10 +35,10 @@ def findFounders(df):
             df[df['Ego'] == ego]['Father'] = newEgoID # TODO: Causes Warning but works!
 
         # If Mother is missing, create a new entry for the Mother
-        if mother is None and father is not None:
+        if np.isnan(mother) and not np.isnan(father):
             # Create a new entry with the missing mother
-            newEgoID = (str)((int)(df['Ego'].max()) + 1)
-            new_entry = [{'Ego': newEgoID, 'Father': None, 'Mother': None, 'Sex': 'F', 'Living': None}]
+            newEgoID = (int)(df['Ego'].max()) + 1
+            new_entry = [{'Ego': newEgoID, 'Father': np.nan, 'Mother': np.nan, 'Sex': 'F', 'Living': None}]
             # Save Parent as Founder and add to df
             founders = pd.concat([founders, pd.DataFrame(new_entry)])
             df = pd.concat([df, pd.DataFrame(new_entry)])
@@ -68,7 +68,7 @@ def getStats(df, founders):
     for index, founder in founders.iterrows():
         # Calculate descendants count for each founder
         descendants_count = getDescCounts(df, founder['Ego'])
-
+        
         # Calculate living descendants count for each founder
         living_descendants_count = getLivDescCounts(df, founder['Ego'])
 
@@ -99,11 +99,11 @@ def getStats(df, founders):
 # Returns the number of descendents of Ego
 def getDescCounts(df, ego):
     # Base case: if the founder has no descendants, return 0
-    temp = df[(df['Father'] == (str)(ego)) | (df['Mother'] == (str)(ego))]
-    if not df[(df['Father'] == (str)(ego)) | (df['Mother'] == (str)(ego))].empty:
+    temp = df[(df['Father'] == ego) | (df['Mother'] == ego)]
+    if not temp.empty:
         # Recursive case: count the direct descendants and recursively count descendants of each child
         descendants_count = 0
-        children = pd.concat([df[df['Father'] == (str)(ego)], df[df['Mother'] == (str)(ego)]])
+        children = pd.concat([df[df['Father'] == ego], df[df['Mother'] == ego]])
         for index, child in children.iterrows():
             descendants_count += 1  # Count the current child
             descendants_count += getDescCounts(df, child['Ego'])  # Recursively count descendants of the child
@@ -117,10 +117,10 @@ def getDescCounts(df, ego):
 # Returns the number of living descendents of Ego
 def getLivDescCounts(df, ego):
     # Base case: if the founder has no descendants, return 0
-    if not df[((df['Father'] == (str)(ego)) | (df['Mother'] == (str)(ego))) & (df['Living'] == 'Y')].empty:
+    if not df[((df['Father'] == ego) | (df['Mother'] == ego)) & (df['Living'] == 'Y')].empty:
         # Recursive case: count the direct living descendants and recursively count living descendants of each child
         living_descendants_count = 0
-        children = df[((df['Father'] == (str)(ego)) | (df['Mother'] == (str)(ego))) & (df['Living'] == 'Y')]
+        children = df[((df['Father'] == ego) | (df['Mother'] == ego)) & (df['Living'] == 'Y')]
         for index, child in children.iterrows():
             living_descendants_count += 1  # Count the current living child
             living_descendants_count += getLivDescCounts(df, child['Ego'])  # Recursively count living descendants of the child
