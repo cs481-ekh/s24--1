@@ -1,3 +1,7 @@
+# Required Installs
+    pip install pandas
+    pip install numpy
+
 # Descent Rebuild
 BSU CS481 Capstone - Team (-1)
 

@@ -1,3 +1,10 @@
+### Peter Busche
+# TEST INPUT:
+    # python main.py --i Assets\TestData\ZikerInputFile.csv --c relatedness
+    # python main.py --i Assets\TestData\ZikerInputFile.csv --c lineages
+###
+
+
 # Main Python File
 # (Should Start from CLI and run window.py if GUI is chosen)
 
@@ -14,8 +21,28 @@ def print_details():
     return print_usage() + "\nTODO: The list of options for each flag would be listed here."
     return print_usage() + "\nTODO: The list of options for each flag would be listed here."
 
-def select_calc_option(str):
-    print(f"TODO: Calculation option {str} would be selected here.", file=sys.stdout)
+def select_calc_option(option):
+    if dataMan is None:
+        print("DataManager is not initialized. Please provide a valid input file using the --i flag.", file=sys.stdout)
+        return
+
+    if option == "relatedness":
+        # relatedness_result = dataMan.calculateRMatrix()
+        # print("Relatedness Calculation Result:", relatedness_result, file=sys.stdout)
+        print("RELATEDNESS")
+        
+    elif option == "lineages":
+        # lineages_result = dataMan.calculate_lineages()
+        # print("Lineages Calculation Result:", lineages_result, file=sys.stdout)
+        print("LINEAGES")
+
+    elif option == "founders":
+
+
+        print("FOUNDERS")
+    else:
+        print(f"Invalid calculation option: {option}", file=sys.stdout)
+
 
 def select_out_option(str):
     print(f"TODO: Output option {str} would be selected here.", file=sys.stdout)
@@ -36,11 +63,14 @@ def cli_init(str_list):
         if "--h" in str_list[v]:
             retVal = print_usage()
             break
+
         elif "--hf" in str_list[v]:
             retVal = print_details()
             break
+
+
         elif "--i" in str_list[v]:
-            if v >= (len(str_list) + 1):
+            if len(str_list) <= v + 1:
                 retVal += "--i flag requires a valid filename." + "\n"
             else:
                 input_filename = str_list[v + 1]
@@ -54,24 +84,28 @@ def cli_init(str_list):
 
                     dataMan.checkForErrors()
 
-                    dataMan.getFounders()
-                    print(dataMan.getFounderStats())
+                    # dataMan.getFounders()
+                    # print(dataMan.getFounderStats())
                 else:
                     retVal += f"{input_filename} could not be found and was not opened.\n"
 
         elif "--g" in str_list[v]:
             global gui_enable
             gui_enable = True
+
         elif "--c" in str_list[v]:
-            if len(str_list) >= v:
-                retVal += "--c flag requires a valid calculation option."
+            if len(str_list) <= v + 1:
+                retVal += "--c flag requires a valid calculation option.\n"
             else:
                 select_calc_option(str_list[v + 1])
+
+
         elif "--o" in str_list[v]:
             if len(str_list) >= v:
                 retVal += "--o flag requires a valid output option."
             else:
                 select_out_option(str_list[v + 1])
+
     return retVal
 
 print(cli_init(sys.argv))

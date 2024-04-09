@@ -4,7 +4,6 @@ import numpy as np
 # Math Files
 import Founders
 
-
 class DataManager:
     # Initializes DataManager using Input File Name (../Example.csv)
     def __init__(self, filename):
@@ -133,11 +132,15 @@ class DataManager:
         # Return all error messages
         return error_messages
 
-    #region ========== Module Access =========
+#region ======================== Module Access =============================
 
     # TODO: Relate Here
 
-    #region ========= Founders =========
+#endregion==================================================================
+
+
+
+#region ======================== Founders ==================================
 
     # Returns Dataframe of Founders and creates a property with same data
     # Founders include: No Parents OR Non-existing Parents (Gets Added)
@@ -181,8 +184,11 @@ class DataManager:
             self.founderStats = self.getFoundersStats()
         return self.founderStats[4]
 
-    #endregion
+#endregion==================================================================
 
+
+
+#region ======================== OTHERS ==================================
     # TODO: Lineage Here
         
     # TODO: Kin Counter Here
@@ -195,10 +201,13 @@ class DataManager:
         
     # TODO: PCA Here
 
-    #endregion
+#endregion==================================================================
 
-    #region ========== MATH + PyPedal ==========
 
+
+
+
+#region ======================== MATH + PyPedal ==================================
     
 
     # Returns a DataFrame of size N x N
@@ -213,6 +222,7 @@ class DataManager:
                     # Calculate relatedness between individuals i and j
                     relatedness = self.calculateRelatedness(i, j, set())
                     r_matrix.iloc[i, j] = relatedness
+                    # r_matrix.iat[i, j] = relatedness #set value by int position instead of 
 
             return r_matrix
         except Exception as e:
@@ -265,11 +275,14 @@ class DataManager:
         return self.df.iloc[i]['Father'] == self.df.iloc[j]['Father'] or \
                self.df.iloc[i]['Mother'] == self.df.iloc[j]['Mother']
 
+#endregion==================================================================
 
-    #endregion
 
-    #region ========== Pandas Utils ==========
 
+
+
+
+#region ======================== Pandas Utils ==================================
     def convert_to_int(value):
         try:
             return int(value)
@@ -318,7 +331,7 @@ class DataManager:
     def GetData(self):
         return self.df
 
-    #endregion
+#endregion==================================================================
     
     # # TODO: Generic Export Method that takes in a type to determine what data to include
     # def exportData(self, data, type):
