@@ -1,7 +1,14 @@
 import tkinter as tk
-from tkinter import filedialog, ttk
+from tkinter import *
+from tkinter import filedialog, ttk, messagebox
 from tkhtmlview import HTMLLabel
+import pandas as pd
+from pandastable import Table, TableModel
 from DataManager import DataManager
+
+data_manager = None
+width = 600
+height = 400
 
 class GUI:
     @classmethod
@@ -13,10 +20,9 @@ class GUI:
     def __init__(self, root):
         self.root = root
         self.root.title("DataManager GUI")
-        self.data_manager = None
 
         # Sizing
-        self.root.minsize(600, 400)
+        self.root.minsize(width, height)
 
         # Create Menu Bar
         self.menu_bar = tk.Menu(self.root)
@@ -41,73 +47,45 @@ class GUI:
         # Add Export menu options here
         self.menu_bar.add_cascade(label="Export", menu=self.export_menu)
 
+        self.CreateNotebook()
+
+    # Builds global tabs
+    def CreateNotebook(self):
         # Notebook for tabs
         self.notebook = ttk.Notebook(self.root)
         self.notebook.pack(expand=True, fill="both")
 
-
-        #region ========= Tabs =========
-
-        # Editor
-        self.editor_panel = EditorPanel(self.notebook)
-        self.notebook.add(self.editor_panel, text="Editor")
-
-        # Relatedness
-        self.relatedness_frame = tk.Frame(self.notebook)
-        self.notebook.add(self.relatedness_frame, text="Relatedness")
-
-        # Founders
-        self.founder_frame = tk.Frame(self.notebook)
-        self.notebook.add(self.founder_frame, text="Founders")
-
-        # Lineages
-        self.lineages_frame = tk.Frame(self.notebook)
-        self.notebook.add(self.lineages_frame, text="Lineages")
-
-        # Kin Counter
-        self.kin_counter_frame = tk.Frame(self.notebook)
-        self.notebook.add(self.kin_counter_frame, text="Kin Counter")
-
-        # Kin
-        self.kin_frame = tk.Frame(self.notebook)
-        self.notebook.add(self.kin_frame, text="Kin")
-
-        # Groups
-        self.groups_frame = tk.Frame(self.notebook)
-        self.notebook.add(self.groups_frame, text="Groups")
-
-        # Plot
-        self.plot_frame = tk.Frame(self.notebook)
-        self.notebook.add(self.plot_frame, text="Plot")
-
-        # PCA
-        self.pca_frame = tk.Frame(self.notebook)
-        self.notebook.add(self.pca_frame, text="PCA")
-
-        # Help
+        # Startup Tab - Help
         self.help_frame = tk.Frame(self.notebook)
         self.notebook.add(self.help_frame, text="Help")
         self.add_help_content()
 
-        # Hide all Tabs Except Help
-        for i in range(len(self.notebook.tabs())):
-            if self.notebook.tab(i, "text") != "Help":
-                self.notebook.hide(i)
-
-        #endregion
+    def TabSetup(self):
+        "Set up notebook tabs."
+        self.ClearTabs()
+        self.CreateNotebook()
+        self.notebook.insert(0, EditorPanel(self.notebook), text="Editor")
+        self.notebook.insert(1, RelatednessPanel(self.notebook), text="Relatedness")
+        self.notebook.insert(2, FoundersPanel(self.notebook), text="Founders")
+        self.notebook.insert(3, LineagePanel(self.notebook), text="Lineages")
+        self.notebook.insert(4, KinGroupPanel(self.notebook), text="Kin Counter")
+        self.notebook.insert(5, KinPanel(self.notebook), text="Kin")
+        self.notebook.insert(6, GroupPanel(self.notebook), text="Groups")
+        self.notebook.insert(7, PlotPanel(self.notebook), text="Plot")
+        self.notebook.insert(8, PCAPanel(self.notebook), text="PCA")
+        self.notebook.select(0)
+    
+    def ClearTabs(self):
+        self.notebook.destroy()
 
     def load_csv(self):
         filename = filedialog.askopenfilename(filetypes=[("CSV files", "*.csv")])
         if filename:
-            self.data_manager = DataManager(filename)
+            global data_manager
+            data_manager = DataManager(filename)
             print("CSV loaded successfully.")
 
-            # Shows all Tabs after successful load
-            for i in range(len(self.notebook.tabs())):
-                self.notebook.select(i)
-            
-            # Selects Editor Tab
-            self.notebook.select(0)
+            self.TabSetup()
     
     def save_file(self):
         # Add logic to save file
@@ -166,49 +144,247 @@ class EditorPanel(tk.Frame):
     def __init__(self, parent):
         super().__init__(parent)
         self.parent = parent
-        self.data = None  # To store CSV data
 
         # Create widgets
-        self.create_widgets()
+        self.create_panel_layout()
 
-    def create_widgets(self):
+        # Fill Data Table with DataFrame
+        global data_manager
+        tempDF = pd.DataFrame(data_manager.data)
+        self.load_data_frame(tempDF)
 
-        # Display CSV data (using a treeview widget for tabular data)
-        self.tree = ttk.Treeview(self)
-        self.tree["columns"] = ("#1", "#2", "#3", "#4", "#5")  # Adjust as per your CSV columns
-        self.tree.heading("#0", text="Index")
-        self.tree.heading("#1", text="Column 1")
-        self.tree.heading("#2", text="Column 2")
-        self.tree.heading("#3", text="Column 3")
-        self.tree.heading("#4", text="Column 4")
-        self.tree.heading("#5", text="Column 5")
-        self.tree.pack(expand=True, fill="both")
+        # Fills Dropdown Menus with options
+        self.load_selection_menu(tempDF)
 
-        # Error text box
-        self.error_text = tk.Text(self, height=10, width=50)
-        self.error_text.pack(side="right", fill="y")
+    # Builds Panel Layout for 3 sections; Data, Error, and Selection
+    def create_panel_layout(self):
+        self.upper = tk.Frame(self)
+        self.upper.pack(side = 'top')
+        self.data_pane = tk.Frame(self.upper, highlightbackground='Black', highlightthickness=2)
+        self.data_pane.pack(side = "left")
+        self.error_pane = tk.Frame(self.upper, highlightbackground='Black', highlightthickness=2, height=height, width=width * 0.3)
+        self.error_pane.pack(side = "right")
+        self.selection_pane = tk.Frame(self, highlightbackground='Black', highlightthickness=2, height=height * 0.3, width=width)
+        self.selection_pane.pack(side = "bottom", fill=BOTH)
 
-        # Select columns and expected values
-        self.column_selection = tk.Listbox(self, height=5, selectmode="multiple")
-        self.column_selection.pack()
-        self.expected_values_entry = tk.Entry(self)
-        self.expected_values_entry.pack()
+        # label1 = Label(data_pane, text="Data")
+        # label1.pack()
+        # label2 = Label(error_pane, text="Error")
+        # label2.pack()
+        # label3 = Label(selection_pane, text="Selection")
+        # label3.pack()
 
-    def load_csv(self):
-        # Load CSV file
-        filename = filedialog.askopenfilename(filetypes=[("CSV files", "*.csv")])
-        if filename:
-            self.data = pd.read_csv(filename)
-            self.display_data()
+    # Loads dataframe into grid
+    def load_data_frame(self, df):
+        self.data_pane.pack(fill=BOTH,expand=1)
+        self.table = pt = Table(self.data_pane, dataframe=df,
+                                showtoolbar=False, showstatusbar=True)
+        pt.show()
 
-    def display_data(self):
-        # Clear existing data in the treeview
-        for item in self.tree.get_children():
-            self.tree.delete(item)
-        
-        # Insert CSV data into the treeview
-        for idx, row in self.data.iterrows():
-            self.tree.insert("", tk.END, text=str(idx), values=tuple(row))
+    def load_selection_menu(self, df):
+        # Contains Header Checkbox
+        containsHeading = Checkbutton(self.selection_pane, text="Row one contains column headings")
+        containsHeading.grid(row=0, column=0, columnspan=4)
+
+        # Check for Incest Checkbox
+        incest = Checkbutton(self.selection_pane, text="Incest")
+        incest.grid(row=0, column=10)
+
+        # Ego Dropdown Menu
+        ttk.Label(self.selection_pane, text = "Ego :", 
+          font = ("Times New Roman", 10)).grid(row=1, 
+          column=0) 
+        n = tk.StringVar() 
+        egoDropdown = ttk.Combobox(self.selection_pane, width = 10, textvariable = n)
+        egoDropdown['values'] = df.columns.tolist()
+        egoDropdown.grid(row=1, column=1)
+
+        # Father Dropdown Menu
+        ttk.Label(self.selection_pane, text = "Father:", 
+          font = ("Times New Roman", 10)).grid(row=1, 
+          column=2) 
+        n = tk.StringVar() 
+        fatherDropdown = ttk.Combobox(self.selection_pane, width = 10, textvariable = n)
+        fatherDropdown['values'] = df.columns.tolist()
+        fatherDropdown.grid(row=1, column=3)
+
+        # Mother Dropdown Menu
+        ttk.Label(self.selection_pane, text = "Mother:", 
+          font = ("Times New Roman", 10)).grid(row=2, 
+          column=2) 
+        n = tk.StringVar() 
+        motherDropdown = ttk.Combobox(self.selection_pane, width = 10, textvariable = n)
+        motherDropdown['values'] = df.columns.tolist()
+        motherDropdown.grid(row=2, column=3)
+
+        # Sex Dropdown Menu
+        ttk.Label(self.selection_pane, text = "Sex:", 
+          font = ("Times New Roman", 10)).grid(row=2, 
+          column=0) 
+        n = tk.StringVar() 
+        sexDropdown = ttk.Combobox(self.selection_pane, width = 10, textvariable = n)
+        sexDropdown['values'] = df.columns.tolist()
+        sexDropdown.grid(row=2, column=1)
+
+        # Living Dropdown Menu
+        ttk.Label(self.selection_pane, text = "Living:", 
+          font = ("Times New Roman", 10)).grid(row=1, 
+          column=4) 
+        n = tk.StringVar() 
+        livingDropdown = ttk.Combobox(self.selection_pane, width = 10, textvariable = n)
+        livingDropdown['values'] = df.columns.tolist()
+        livingDropdown.grid(row=1, column=5)
+
+        # Male Textbox
+        ttk.Label(self.selection_pane, text = "Male:", 
+          font = ("Times New Roman", 10)).grid(row=1, 
+          column=6) 
+        maleValue = tk.Text(self.selection_pane, 
+                        height = 1, 
+                        width = 5)
+        maleValue.grid(row=1, column=7)
+
+        # Female Textbox
+        ttk.Label(self.selection_pane, text = "Female:", 
+          font = ("Times New Roman", 10)).grid(row=2, 
+          column=6) 
+        femaleValue = tk.Text(self.selection_pane, 
+                        height = 1, 
+                        width = 5)
+        femaleValue.grid(row=2, column=7)
+
+        # Alive Textbox
+        ttk.Label(self.selection_pane, text = "Alive:", 
+          font = ("Times New Roman", 10)).grid(row=1, 
+          column=8) 
+        aliveValue = tk.Text(self.selection_pane, 
+                        height = 1, 
+                        width = 5)
+        aliveValue.grid(row=1, column=9)
+
+        # Dead Textbox
+        ttk.Label(self.selection_pane, text = "Dead:", 
+          font = ("Times New Roman", 10)).grid(row=2, 
+          column=8) 
+        deadValue = tk.Text(self.selection_pane, 
+                        height = 1, 
+                        width = 5)
+        deadValue.grid(row=2, column=9)
+
+        # Missing Textbox
+        ttk.Label(self.selection_pane, text = "Missing:", 
+          font = ("Times New Roman", 10)).grid(row=2, 
+          column=10) 
+        deadValue = tk.Text(self.selection_pane, 
+                        height = 1, 
+                        width = 5)
+        deadValue.grid(row=1, column=10)
+
+        # Check Error Button
+        checkErrorButton = tk.Button(self.selection_pane, 
+                                text = "Check Errors",  
+                                command = self.load_errors)
+        checkErrorButton.grid(row=0, column=6, columnspan=3)
+
+    def load_errors(self):
+        v = Scrollbar(self.error_pane, orient='vertical')
+        v.pack(side='right', fill='y')
+
+        text = Text(self.error_pane, yscrollcommand=v.set)
+
+        for e in errors:
+            text.insert(END, e + "\n\n")
+
+        text.pack()
+        pass
+
+class RelatednessPanel(tk.Frame):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.parent = parent
+
+        self.temp = tk.Frame(self, highlightbackground='Black', highlightthickness=2)
+        self.temp.pack()
+
+        label = Label(self.temp, text="In Development")
+        label.pack()
+
+class FoundersPanel(tk.Frame):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.parent = parent
+
+        self.temp = tk.Frame(self, highlightbackground='Black', highlightthickness=2)
+        self.temp.pack(side = "bottom")
+
+        label = Label(self.temp, text="In Development")
+        label.pack()
+
+class LineagePanel(tk.Frame):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.parent = parent
+
+        self.temp = tk.Frame(self, highlightbackground='Black', highlightthickness=2)
+        self.temp.pack(side = "bottom")
+
+        label = Label(self.temp, text="In Development")
+        label.pack()
+
+class KinGroupPanel(tk.Frame):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.parent = parent
+
+        self.temp = tk.Frame(self, highlightbackground='Black', highlightthickness=2)
+        self.temp.pack(side = "bottom")
+
+        label = Label(self.temp, text="In Development")
+        label.pack()
+
+class KinPanel(tk.Frame):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.parent = parent
+
+        self.temp = tk.Frame(self, highlightbackground='Black', highlightthickness=2)
+        self.temp.pack(side = "bottom")
+
+        label = Label(self.temp, text="In Development")
+        label.pack()
+
+class GroupPanel(tk.Frame):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.parent = parent
+
+        self.temp = tk.Frame(self, highlightbackground='Black', highlightthickness=2)
+        self.temp.pack(side = "bottom")
+
+        label = Label(self.temp, text="In Development")
+        label.pack()
+
+class PlotPanel(tk.Frame):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.parent = parent
+
+        self.temp = tk.Frame(self, highlightbackground='Black', highlightthickness=2)
+        self.temp.pack(side = "bottom")
+
+        label = Label(self.temp, text="In Development")
+        label.pack()
+
+class PCAPanel(tk.Frame):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.parent = parent
+
+        self.temp = tk.Frame(self, highlightbackground='Black', highlightthickness=2)
+        self.temp.pack(side = "bottom")
+
+        label = Label(self.temp, text="In Development")
+        label.pack()
 
 if __name__ == "__main__":
     GUI.run()
