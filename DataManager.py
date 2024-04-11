@@ -1,5 +1,6 @@
 import pandas as pd # Excellent Documentation: https://pandas.pydata.org/docs/reference/frame.html
 import numpy as np
+import networkx as nx
 
 # Math Files
 import Founders
@@ -219,6 +220,8 @@ class DataManager:
     # Takes in blank set: visited, to not repeat people
     # TODO: Currently Returns Error: `Error calculating RMatrix: Cannot index by location index with a non-integer key`
     def calculateRelatedness(self, i, j, visited):
+
+        print()
         # Check if individuals i and j are the same individual
         if i == j:
             return 1  # Full relatedness to oneself
