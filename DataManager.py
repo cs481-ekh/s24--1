@@ -245,6 +245,7 @@ class DataManager:
         if self.isSibling(i, j):
             return 0.25  # Relatedness to a sibling
         
+        print(f"{i} {j}\n{self.df}")
         # Check if individuals i and j are distantly related through common ancestors
         for parent_i in [self.df[self.df['Ego'] == i]['Father'].iloc[0], self.df[self.df['Ego'] == i]['Mother'].iloc[0]]:
             if pd.notnull(parent_i):
