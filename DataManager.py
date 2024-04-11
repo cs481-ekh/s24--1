@@ -15,6 +15,7 @@ class DataManager:
             self.rm = None # Relate Matrix DataFrame
             self.founders = None # Founders DataFrame
             self.founderStats = None # Founders Descendant Stats
+            self.lineages = None # Lineages DataFrame
 
             if filename.endswith('.csv'): # CSV Only
                 with open(filename, 'r') as f:
@@ -182,7 +183,8 @@ class DataManager:
     #region ========= Lineages =========
 
     def getLineages(self):
-        self.lineages = Lineages.findLineages(self.df)
+        if self.lineages == None:
+            self.lineages = Lineages.findLineages(self.df)
         return self.lineages
 
     #endregion
