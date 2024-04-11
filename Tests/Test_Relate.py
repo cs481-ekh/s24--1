@@ -46,5 +46,3 @@ def test_grandparent_relatedness(valid_data_manager):
 def test_cousin_relatedness(valid_data_manager):
     assert valid_data_manager.calculateRelatedness(14, 4, set()) == 0.125
     assert valid_data_manager.calculateRelatedness(14, 15, set()) == 0.0625
-
-#endregion

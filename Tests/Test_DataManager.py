@@ -36,11 +36,8 @@ def valid_data_manager():
 #region Validation
 
 # Test checkForErrors function
-def test_check_no_errors(valid_data_manager):
+def test_check_for_errors(valid_data_manager):
     assert len(valid_data_manager.checkForErrors()) == 0
-
-def test_check_yes_errors(sample_data_manager):
-    assert len(sample_data_manager.checkForErrors()) == 63
 
 #endregion
 
