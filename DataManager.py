@@ -3,6 +3,7 @@ import numpy as np
 
 # Math Files
 import Founders
+import Lineages
 
 
 class DataManager:
@@ -178,7 +179,13 @@ class DataManager:
 
     #endregion
 
-    # TODO: Lineage Here
+    #region ========= Lineages =========
+
+    def getLineages(self):
+        self.lineages = Lineages.findLineages(self.df)
+        return self.lineages
+
+    #endregion
         
     # TODO: Kin Counter Here
         
@@ -240,8 +247,7 @@ class DataManager:
         
         print(f"{i} {j}\n{self.df}")
         # Check if individuals i and j are distantly related through common ancestors
-        print(f"Test:\n{type(self.df[self.df['Ego'] == i]['Mother'].iloc[0])}")
-        for parent_i in [self.df[self.df['Ego'] == i]['Father'].iloc[0], [self.df['Ego'] == i]['Mother'].iloc[0]]:
+        for parent_i in [self.df[self.df['Ego'] == i]['Father'].iloc[0], self.df[self.df['Ego'] == i]['Mother'].iloc[0]]:
             if pd.notnull(parent_i):
                 for parent_j in [self.df[self.df['Ego'] == j]['Father'].iloc[0], self.df[self.df['Ego'] == j]['Mother'].iloc[0]]:
                     if pd.notnull(parent_j):

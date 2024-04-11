@@ -33,3 +33,5 @@ def test_no_crash(valid_data_manager):
 
 def test_father_relatedness(valid_data_manager):
     assert valid_data_manager.calculateRelatedness(3, 1, set()) == 0.5
+
+#endregion
