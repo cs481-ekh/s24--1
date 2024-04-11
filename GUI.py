@@ -167,13 +167,6 @@ class EditorPanel(tk.Frame):
         self.selection_pane = tk.Frame(self, highlightbackground='Black', highlightthickness=2, height=height * 0.3, width=width)
         self.selection_pane.pack(side = "bottom", fill=BOTH)
 
-        # label1 = Label(data_pane, text="Data")
-        # label1.pack()
-        # label2 = Label(error_pane, text="Error")
-        # label2.pack()
-        # label3 = Label(selection_pane, text="Selection")
-        # label3.pack()
-
     # Loads dataframe into grid
     def load_data_frame(self, df):
         self.data_pane.pack(fill=BOTH,expand=1)
