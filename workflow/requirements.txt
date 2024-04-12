@@ -4,5 +4,4 @@ numpy
 pydot
 pandas
 pandastable
-tkinter
 tkhtmlview
