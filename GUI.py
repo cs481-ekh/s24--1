@@ -144,18 +144,20 @@ class EditorPanel(tk.Frame):
     def __init__(self, parent):
         super().__init__(parent)
         self.parent = parent
-        self.boolFirstRow = BooleanVar()
+
+        self.firstRow = None
+        self.removeHeader = BooleanVar()
 
         # Create widgets
         self.create_panel_layout()
 
         # Fill Data Table with DataFrame
         global data_manager
-        tempDF = pd.DataFrame(data_manager.data)
-        self.load_data_frame(tempDF)
+        self.startingDataFrame = pd.DataFrame(data_manager.data)
+        self.load_data_frame(self.startingDataFrame)
 
         # Fills Dropdown Menus with options
-        self.load_selection_menu(tempDF)
+        self.load_selection_menu(self.startingDataFrame)
 
     # Builds Panel Layout for 3 sections; Data, Error, and Selection
     def create_panel_layout(self):
@@ -178,7 +180,7 @@ class EditorPanel(tk.Frame):
     # Displays Dropdown Menus, Check Boxes, Text Entries, and Check Errors Button
     def load_selection_menu(self, df):
         # Contains Header Checkbox
-        containsHeading = Checkbutton(self.selection_pane, text="Row one contains column headings", variable=self.boolFirstRow, command=self.toggle_first_row_header)
+        containsHeading = Checkbutton(self.selection_pane, text="Row one contains column headings", variable=self.removeHeader, command=self.toggle_first_row_header)
         containsHeading.grid(row=0, column=0, columnspan=4)
 
         # Check for Incest Checkbox
@@ -297,10 +299,14 @@ class EditorPanel(tk.Frame):
         pass
 
     def toggle_first_row_header(self):
-        
-        if self.boolFirstRow.get(): # Is Checked
+        if self.removeHeader.get(): # Is Checked
+            self.firstRow = self.table.getSelectedRowData()
+            #self.oldTable = self.table.copyTable()
+            self.table.deleteRow(0)
             pass
         else: # Not Checked
+            self.table.updateModel(TableModel(self.startingDataFrame))
+            self.table.redrawVisible()
             pass
         pass
 
