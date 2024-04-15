@@ -174,7 +174,7 @@ class EditorPanel(tk.Frame):
     def load_data_frame(self, df):
         self.data_pane.pack(fill=BOTH,expand=1)
         self.table = pt = Table(self.data_pane, dataframe=df,
-                                showtoolbar=False, showstatusbar=True)
+                                showtoolbar=False, showstatusbar=True, )
         pt.show()
 
     # Displays Dropdown Menus, Check Boxes, Text Entries, and Check Errors Button
@@ -299,15 +299,24 @@ class EditorPanel(tk.Frame):
         pass
 
     def toggle_first_row_header(self):
+        
         if self.removeHeader.get(): # Is Checked
             self.firstRow = self.table.getSelectedRowData()
-            #self.oldTable = self.table.copyTable()
-            self.table.deleteRow(0)
-            pass
+            # Update Column Names
+            #visibleDataFrame = self.table.model.df
+            column_names = []
+            for c in self.firstRow:
+                column_names.append(self.firstRow[c])
+        
+            self.table.model.df.columns[0] = column_names
+
+            self.table.deleteRow()
+            
         else: # Not Checked
-            self.table.updateModel(TableModel(self.startingDataFrame))
-            self.table.redrawVisible()
-            pass
+            #self.table.updateModel(TableModel(self.startingDataFrame))
+            self.table.model.df = self.startingDataFrame
+            self.table.setSelectedRow(0)
+        self.table.redrawVisible()
         pass
 
 class RelatednessPanel(tk.Frame):
