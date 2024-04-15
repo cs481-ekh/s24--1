@@ -144,6 +144,7 @@ class EditorPanel(tk.Frame):
     def __init__(self, parent):
         super().__init__(parent)
         self.parent = parent
+        self.boolFirstRow = BooleanVar()
 
         # Create widgets
         self.create_panel_layout()
@@ -174,9 +175,10 @@ class EditorPanel(tk.Frame):
                                 showtoolbar=False, showstatusbar=True)
         pt.show()
 
+    # Displays Dropdown Menus, Check Boxes, Text Entries, and Check Errors Button
     def load_selection_menu(self, df):
         # Contains Header Checkbox
-        containsHeading = Checkbutton(self.selection_pane, text="Row one contains column headings")
+        containsHeading = Checkbutton(self.selection_pane, text="Row one contains column headings", variable=self.boolFirstRow, command=self.toggle_first_row_header)
         containsHeading.grid(row=0, column=0, columnspan=4)
 
         # Check for Incest Checkbox
@@ -285,10 +287,21 @@ class EditorPanel(tk.Frame):
 
         text = Text(self.error_pane, yscrollcommand=v.set)
 
+        global data_manager
+        errors = data_manager.checkForErrors()
+
         for e in errors:
             text.insert(END, e + "\n\n")
 
         text.pack()
+        pass
+
+    def toggle_first_row_header(self):
+        
+        if self.boolFirstRow.get(): # Is Checked
+            pass
+        else: # Not Checked
+            pass
         pass
 
 class RelatednessPanel(tk.Frame):
