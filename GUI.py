@@ -302,7 +302,7 @@ class EditorPanel(tk.Frame):
         pass
 
     # Gets called with Checkbox (First row contains Header)
-    # Updates pandastable dataframe; deletes/adds first row, updates colunm names
+    # Updates pandastable dataframe; deletes/adds first row, updates column names
     def toggle_first_row_header(self):
         if self.removeHeader.get(): # Is Checked
             self.table.setSelectedRow(0)
@@ -316,10 +316,10 @@ class EditorPanel(tk.Frame):
             self.table.model.df = self.startingDataFrame
 
             # Reset Columns to Numbers
-            colunm_names = []
+            column_names = []
             for x in range(len(self.table.model.df.columns)):
-                colunm_names.append(x)
-            self.table.model.df.columns = colunm_names
+                column_names.append(x)
+            self.table.model.df.columns = column_names
 
         self.table.redrawVisible()
         self.table.statusbar.update()
