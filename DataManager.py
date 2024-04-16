@@ -1,5 +1,6 @@
 import pandas as pd # Excellent Documentation: https://pandas.pydata.org/docs/reference/frame.html
 import numpy as np
+import networkx as nx
 
 # Math Files
 import Founders
@@ -12,6 +13,7 @@ class DataManager:
         try:
             self.data = []
             self.df = None # DataFrame
+            self.graph = None # networkx graph
             self.rm = None # Relate Matrix DataFrame
             self.founders = None # Founders DataFrame
             self.founderStats = None # Founders Descendant Stats
@@ -130,6 +132,10 @@ class DataManager:
         # Return all error messages
         return error_messages
 
+    def createNxGraph(self):
+        edges = pd.DataFrame(pd.Series(data=list(self.df[['Father', 'Mother']].values), index=self.df['Ego']).explode().dropna().astype(int)).reset_index()
+        self.graph = nx.from_pandas_edgelist(edges, 0, 'Ego', create_using=nx.DiGraph)
+
     #region ========== Module Access =========
 
     # TODO: Relate Here
@@ -215,7 +221,7 @@ class DataManager:
             for i in range(num_individuals):
                 for j in range(num_individuals):
                     # Calculate relatedness between individuals i and j
-                    relatedness = self.calculateRelatedness(i, j, set())
+                    relatedness = self.calculateRelatedness(i, j)
                     r_matrix.iloc[i, j] = relatedness
 
             return r_matrix
@@ -227,49 +233,17 @@ class DataManager:
     # Takes in Ego i and Ego j of self.df
     # Takes in blank set: visited, to not repeat people
     # TODO: Currently Returns Error: `Error calculating RMatrix: Cannot index by location index with a non-integer key`
-    def calculateRelatedness(self, i, j, visited):
-        # Check if individuals i and j are the same individual
-        if i == j:
-            return 1  # Full relatedness to oneself
-        
-        # Check if the relatedness between i and j has already been calculated
-        if (i, j) in visited or (j, i) in visited:
-            return 0  # Avoid infinite recursion
-        
-        # Add the current pair to the set of visited pairs
-        visited.add((i, j))
-        
-        # Check if individuals i and j share a parent
-        if self.isParent(i, j) or self.isParent(j, i):
-            return 0.5  # Relatedness to a parent
-        
-        # Check if individuals i and j share a sibling
-        if self.isSibling(i, j):
-            return 0.25  # Relatedness to a sibling
-        
-        print(f"{i} {j}\n{self.df}")
-        # Check if individuals i and j are distantly related through common ancestors
-        for parent_i in [self.df[self.df['Ego'] == i]['Father'].iloc[0], self.df[self.df['Ego'] == i]['Mother'].iloc[0]]:
-            if pd.notnull(parent_i):
-                for parent_j in [self.df[self.df['Ego'] == j]['Father'].iloc[0], self.df[self.df['Ego'] == j]['Mother'].iloc[0]]:
-                    if pd.notnull(parent_j):
-                        relatedness = self.calculateRelatedness(parent_i, parent_j, visited)
-                        if relatedness > 0:
-                            # Found a common ancestor
-                            return relatedness * 0.5  # Relatedness is halved for each generation
-
-        # Individuals i and j are not related
-        return 0
-    
-    def isParent(self, i, j):
-        # Check if individual i is a parent of individual j
-        return self.df[self.df['Ego'] == j]['Father'].iloc[0] == i or self.df[self.df['Ego'] == j]['Mother'].iloc[0] == i
-    
-    def isSibling(self, i, j):
-        # Check if individuals i and j share at least one parent
-        return self.df[self.df['Ego'] == i]['Father'].iloc[0] == self.df[self.df['Ego'] == j]['Father'].iloc[0] or \
-               self.df[self.df['Ego'] == i]['Mother'].iloc[0] == self.df[self.df['Ego'] == j]['Mother'].iloc[0]
-
+    def calculateRelatedness(self, i, j):
+        if i not in self.graph or j not in self.graph:
+            return 0
+        parent = list(nx.all_pairs_lowest_common_ancestor(self.graph, [(i, j)]))
+        print(parent)
+        if len(parent) != 1:
+            return 0
+        else:
+            parent = parent[0][1]
+            distance = nx.shortest_path_length(self.graph, parent, i) + nx.shortest_path_length(self.graph, parent, j)
+            return 1 / (2 ** distance)
 
     #endregion
 

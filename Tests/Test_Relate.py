@@ -24,14 +24,29 @@ def valid_data_manager():
     data_manager.createPandasDataFrame(columns=['ID', 'FatherID', 'MotherID', 'Sex', 'Living'], \
                                        values=['M', 'F', 'Y', 'N', ''], \
                                        removeHeader=True)
+    if len(data_manager.checkForErrors()) == 0:
+        data_manager.createNxGraph()
     return data_manager
 
 #region Relatedness
 
-def test_no_crash(valid_data_manager):
-    assert valid_data_manager.calculateRelatedness(0, 0, set()) == 1
+def test_self_relatedness(valid_data_manager):
+    assert valid_data_manager.calculateRelatedness(1, 1) == 1
 
 def test_father_relatedness(valid_data_manager):
-    assert valid_data_manager.calculateRelatedness(3, 1, set()) == 0.5
+    assert valid_data_manager.calculateRelatedness(3, 1) == 0.5
+
+def test_mother_relatedness(valid_data_manager):
+    assert valid_data_manager.calculateRelatedness(3, 2) == 0.5
+
+def test_sibling_relatedness(valid_data_manager):
+    assert valid_data_manager.calculateRelatedness(3, 4) == 0.25
+
+def test_grandparent_relatedness(valid_data_manager):
+    assert valid_data_manager.calculateRelatedness(6, 1) == 0.25
+
+def test_cousin_relatedness(valid_data_manager):
+    assert valid_data_manager.calculateRelatedness(14, 4) == 0.125
+    assert valid_data_manager.calculateRelatedness(14, 15) == 0.0625
 
 #endregion

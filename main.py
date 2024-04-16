@@ -51,8 +51,8 @@ def cli_init(str_list):
                     dataMan.createPandasDataFrame(columns=['PersonID', 'FatherID', 'MotherID', 'Sex', 'Deceased'], \
                                                   values=['Male', 'Female', 'FALSE', 'TRUE', '9999'], \
                                                   removeHeader=True)
-
-                    dataMan.checkForErrors()
+                    if len(dataMan.checkForErrors()) == 0:
+                        dataMan.createNxGraph()
 
                     # Example Uses
                     #print(dataMan.getFounders())
