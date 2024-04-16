@@ -215,14 +215,13 @@ class DataManager:
     # Calculates the relatedness of each individual to each individual
     def calculateRMatrix(self):
         try:
-            num_individuals = len(self.df)
             r_matrix = pd.DataFrame(index=self.df['Ego'], columns=self.df['Ego'])
 
-            for i in range(num_individuals):
-                for j in range(num_individuals):
+            for i in self.df['Ego']:
+                for j in self.df['Ego']:
                     # Calculate relatedness between individuals i and j
                     relatedness = self.calculateRelatedness(i, j)
-                    r_matrix.iloc[i, j] = relatedness
+                    r_matrix.loc[i, j] = relatedness
 
             return r_matrix
         except Exception as e:
@@ -232,12 +231,12 @@ class DataManager:
     # Recursively Determines two individual's relatedness
     # Takes in Ego i and Ego j of self.df
     # Takes in blank set: visited, to not repeat people
-    # TODO: Currently Returns Error: `Error calculating RMatrix: Cannot index by location index with a non-integer key`
     def calculateRelatedness(self, i, j):
+        if i == j:
+            return 1
         if i not in self.graph or j not in self.graph:
             return 0
         parent = list(nx.all_pairs_lowest_common_ancestor(self.graph, [(i, j)]))
-        print(parent)
         if len(parent) != 1:
             return 0
         else:
