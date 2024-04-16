@@ -192,45 +192,45 @@ class EditorPanel(tk.Frame):
           font = ("Times New Roman", 10)).grid(row=1, 
           column=0) 
         n = tk.StringVar() 
-        egoDropdown = ttk.Combobox(self.selection_pane, width = 10, textvariable = n)
-        egoDropdown['values'] = df.columns.tolist()
-        egoDropdown.grid(row=1, column=1)
+        self.egoDropdown = ttk.Combobox(self.selection_pane, width = 10, textvariable = n)
+        self.egoDropdown['values'] = df.columns.tolist()
+        self.egoDropdown.grid(row=1, column=1)
 
         # Father Dropdown Menu
         ttk.Label(self.selection_pane, text = "Father:", 
           font = ("Times New Roman", 10)).grid(row=1, 
           column=2) 
         n = tk.StringVar() 
-        fatherDropdown = ttk.Combobox(self.selection_pane, width = 10, textvariable = n)
-        fatherDropdown['values'] = df.columns.tolist()
-        fatherDropdown.grid(row=1, column=3)
+        self.fatherDropdown = ttk.Combobox(self.selection_pane, width = 10, textvariable = n)
+        self.fatherDropdown['values'] = df.columns.tolist()
+        self.fatherDropdown.grid(row=1, column=3)
 
         # Mother Dropdown Menu
         ttk.Label(self.selection_pane, text = "Mother:", 
           font = ("Times New Roman", 10)).grid(row=2, 
           column=2) 
         n = tk.StringVar() 
-        motherDropdown = ttk.Combobox(self.selection_pane, width = 10, textvariable = n)
-        motherDropdown['values'] = df.columns.tolist()
-        motherDropdown.grid(row=2, column=3)
+        self.motherDropdown = ttk.Combobox(self.selection_pane, width = 10, textvariable = n)
+        self.motherDropdown['values'] = df.columns.tolist()
+        self.motherDropdown.grid(row=2, column=3)
 
         # Sex Dropdown Menu
         ttk.Label(self.selection_pane, text = "Sex:", 
           font = ("Times New Roman", 10)).grid(row=2, 
           column=0) 
         n = tk.StringVar() 
-        sexDropdown = ttk.Combobox(self.selection_pane, width = 10, textvariable = n)
-        sexDropdown['values'] = df.columns.tolist()
-        sexDropdown.grid(row=2, column=1)
+        self.sexDropdown = ttk.Combobox(self.selection_pane, width = 10, textvariable = n)
+        self.sexDropdown['values'] = df.columns.tolist()
+        self.sexDropdown.grid(row=2, column=1)
 
         # Living Dropdown Menu
         ttk.Label(self.selection_pane, text = "Living:", 
           font = ("Times New Roman", 10)).grid(row=1, 
           column=4) 
         n = tk.StringVar() 
-        livingDropdown = ttk.Combobox(self.selection_pane, width = 10, textvariable = n)
-        livingDropdown['values'] = df.columns.tolist()
-        livingDropdown.grid(row=1, column=5)
+        self.livingDropdown = ttk.Combobox(self.selection_pane, width = 10, textvariable = n)
+        self.livingDropdown['values'] = df.columns.tolist()
+        self.livingDropdown.grid(row=1, column=5)
 
         # Male Textbox
         ttk.Label(self.selection_pane, text = "Male:", 
@@ -298,27 +298,34 @@ class EditorPanel(tk.Frame):
         text.pack()
         pass
 
+    # Gets called with Checkbox (First row contains Header)
+    # Updates pandastable dataframe; deletes/adds first row, updates colunm names
     def toggle_first_row_header(self):
-        
         if self.removeHeader.get(): # Is Checked
+            self.table.setSelectedRow(0)
             self.firstRow = self.table.getSelectedRowData()
 
             # Update Column Names
             self.table.model.df.columns = self.firstRow.values[0]
 
             self.table.deleteRow()
-            
         else: # Not Checked
             self.table.model.df = self.startingDataFrame
 
             # Reset Columns to Numbers
-            newNames = []
+            colunm_names = []
             for x in range(len(self.table.model.df.columns)):
-                newNames.append(x)
-            self.table.model.df.columns = newNames
-            
-            self.table.setSelectedRow(0)
+                colunm_names.append(x)
+            self.table.model.df.columns = colunm_names
+
         self.table.redrawVisible()
+        
+        # Update Dropdown Values
+        self.egoDropdown['values'] = self.table.model.df.columns.tolist()
+        self.fatherDropdown['values'] = self.table.model.df.columns.tolist()
+        self.motherDropdown['values'] = self.table.model.df.columns.tolist()
+        self.sexDropdown['values'] = self.table.model.df.columns.tolist()
+        self.livingDropdown['values'] = self.table.model.df.columns.tolist()
 
 class RelatednessPanel(tk.Frame):
     def __init__(self, parent):
