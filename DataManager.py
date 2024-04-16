@@ -4,6 +4,7 @@ import networkx as nx
 
 # Math Files
 import Founders
+import Lineages
 
 
 class DataManager:
@@ -16,6 +17,7 @@ class DataManager:
             self.rm = None # Relate Matrix DataFrame
             self.founders = None # Founders DataFrame
             self.founderStats = None # Founders Descendant Stats
+            self.lineages = None # Lineages DataFrame
 
             if filename.endswith('.csv'): # CSV Only
                 with open(filename, 'r') as f:
@@ -184,7 +186,14 @@ class DataManager:
 
     #endregion
 
-    # TODO: Lineage Here
+    #region ========= Lineages =========
+
+    def getLineages(self):
+        if self.lineages == None:
+            self.lineages = Lineages.findLineages(self.df)
+        return self.lineages
+
+    #endregion
         
     # TODO: Kin Counter Here
         
@@ -235,50 +244,6 @@ class DataManager:
             parent = parent[0][1]
             distance = nx.shortest_path_length(self.graph, parent, i) + nx.shortest_path_length(self.graph, parent, j)
             return 1 / (2 ** distance)
-
-        '''
-        #print(nx.from_pandas_edgelist(self.df))
-        # Check if individuals i and j are the same individual
-        if i == j:
-            return 1  # Full relatedness to oneself
-        
-        # Check if the relatedness between i and j has already been calculated
-        if (i, j) in visited or (j, i) in visited:
-            return 0  # Avoid infinite recursion
-        
-        # Add the current pair to the set of visited pairs
-        visited.add((i, j))
-        
-        # Check if individuals i and j share a parent
-        if self.isParent(i, j) or self.isParent(j, i):
-            return 0.5  # Relatedness to a parent
-        
-        # Check if individuals i and j share a sibling
-        if self.isSibling(i, j):
-            return 0.25  # Relatedness to a sibling
-        
-        # Check if individuals i and j are distantly related through common ancestors
-        for parent_i in [self.df[self.df['Ego'] == i]['Father'].iloc[0], self.df[self.df['Ego'] == i]['Mother'].iloc[0]]:
-            if pd.notnull(parent_i):
-                for parent_j in [self.df[self.df['Ego'] == j]['Father'].iloc[0], self.df[self.df['Ego'] == j]['Mother'].iloc[0]]:
-                    if pd.notnull(parent_j):
-                        relatedness = self.calculateRelatedness(parent_i, parent_j, visited)
-                        if relatedness > 0:
-                            # Found a common ancestor
-                            return relatedness * 0.5  # Relatedness is halved for each generation
-
-        # Individuals i and j are not related
-        return 0
-    
-    def isParent(self, i, j):
-        # Check if individual i is a parent of individual j
-        return self.df[self.df['Ego'] == j]['Father'].iloc[0] == i or self.df[self.df['Ego'] == j]['Mother'].iloc[0] == i
-    
-    def isSibling(self, i, j):
-        # Check if individuals i and j share at least one parent
-        return self.df[self.df['Ego'] == i]['Father'].iloc[0] == self.df[self.df['Ego'] == j]['Father'].iloc[0] or \
-               self.df[self.df['Ego'] == i]['Mother'].iloc[0] == self.df[self.df['Ego'] == j]['Mother'].iloc[0]
-    '''
 
     #endregion
 

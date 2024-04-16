@@ -2,7 +2,7 @@
 # (Should Start from CLI and run window.py if GUI is chosen)
 
 import sys
-#from Descent import *
+from GUI import GUI
 from DataManager import *
 import os
 
@@ -54,8 +54,9 @@ def cli_init(str_list):
                     if len(dataMan.checkForErrors()) == 0:
                         dataMan.createNxGraph()
 
-                    dataMan.getFounders()
-                    print(dataMan.getFounderStats())
+                    # Example Uses
+                    #print(dataMan.getFounders())
+                    print(dataMan.getLineages())
                 else:
                     retVal += f"{input_filename} could not be found and was not opened.\n"
 
@@ -77,4 +78,4 @@ def cli_init(str_list):
 print(cli_init(sys.argv))
 if gui_enable:
     print(f"GUI flag enabled, starting GUI...", file=sys.stderr)
-    #BuildApp()
+    GUI.run()

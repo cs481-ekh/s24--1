@@ -4,3 +4,5 @@ numpy
 pydot
 pandas
 networkx
+pandastable
+tkhtmlview
