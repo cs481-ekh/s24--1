@@ -48,15 +48,17 @@ def cli_init(str_list):
                 if os.path.isfile(input_filename):
                     global dataMan
                     dataMan = DataManager(input_filename)
-                    dataMan.createPandasDataFrame(columns=['PersonID', 'FatherID', 'MotherID', 'Sex', 'Deceased'], \
+                    dataMan.createPandasDataFrame(columns=['ID', 'FatherID', 'MotherID', 'Sex', 'Living'], \
                                                   values=['Male', 'Female', 'FALSE', 'TRUE', '9999'], \
                                                   removeHeader=True)
                     if len(dataMan.checkForErrors()) == 0:
                         dataMan.createNxGraph()
 
+                    dataMan.calculateRMatrix().to_csv("test.csv")
+
                     # Example Uses
                     #print(dataMan.getFounders())
-                    print(dataMan.getLineages())
+                    #print(dataMan.getLineages())
                 else:
                     retVal += f"{input_filename} could not be found and was not opened.\n"
 
