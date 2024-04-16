@@ -12,6 +12,7 @@ class DataManager:
         try:
             self.data = []
             self.df = None # DataFrame
+            self.graph = None # networkx graph
             self.rm = None # Relate Matrix DataFrame
             self.founders = None # Founders DataFrame
             self.founderStats = None # Founders Descendant Stats
@@ -129,6 +130,10 @@ class DataManager:
         # Return all error messages
         return error_messages
 
+    def createNxGraph(self):
+        edges = pd.DataFrame(pd.Series(data=list(self.df[['Father', 'Mother']].values), index=self.df['Ego']).explode().dropna().astype(int)).reset_index()
+        self.graph = nx.from_pandas_edgelist(edges, 0, 'Ego', create_using=nx.DiGraph)
+
     #region ========== Module Access =========
 
     # TODO: Relate Here
@@ -207,7 +212,7 @@ class DataManager:
             for i in range(num_individuals):
                 for j in range(num_individuals):
                     # Calculate relatedness between individuals i and j
-                    relatedness = self.calculateRelatedness(i, j, set())
+                    relatedness = self.calculateRelatedness(i, j)
                     r_matrix.iloc[i, j] = relatedness
 
             return r_matrix
@@ -219,9 +224,20 @@ class DataManager:
     # Takes in Ego i and Ego j of self.df
     # Takes in blank set: visited, to not repeat people
     # TODO: Currently Returns Error: `Error calculating RMatrix: Cannot index by location index with a non-integer key`
-    def calculateRelatedness(self, i, j, visited):
+    def calculateRelatedness(self, i, j):
+        if i not in self.graph or j not in self.graph:
+            return 0
+        parent = list(nx.all_pairs_lowest_common_ancestor(self.graph, [(i, j)]))
+        print(parent)
+        if len(parent) != 1:
+            return 0
+        else:
+            parent = parent[0][1]
+            distance = nx.shortest_path_length(self.graph, parent, i) + nx.shortest_path_length(self.graph, parent, j)
+            return 1 / (2 ** distance)
 
-        print()
+        '''
+        #print(nx.from_pandas_edgelist(self.df))
         # Check if individuals i and j are the same individual
         if i == j:
             return 1  # Full relatedness to oneself
@@ -262,7 +278,7 @@ class DataManager:
         # Check if individuals i and j share at least one parent
         return self.df[self.df['Ego'] == i]['Father'].iloc[0] == self.df[self.df['Ego'] == j]['Father'].iloc[0] or \
                self.df[self.df['Ego'] == i]['Mother'].iloc[0] == self.df[self.df['Ego'] == j]['Mother'].iloc[0]
-
+    '''
 
     #endregion
 
