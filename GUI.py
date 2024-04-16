@@ -177,7 +177,6 @@ class EditorPanel(tk.Frame):
                                 showtoolbar=False, showstatusbar=True, )
         pt.show()
 
-    # Displays Dropdown Menus, Check Boxes, Text Entries, and Check Errors Button
     def load_selection_menu(self, df):
         # Contains Header Checkbox
         containsHeading = Checkbutton(self.selection_pane, text="Row one contains column headings", variable=self.removeHeader, command=self.toggle_first_row_header)
@@ -291,9 +290,6 @@ class EditorPanel(tk.Frame):
         v.pack(side='right', fill='y')
 
         text = Text(self.error_pane, yscrollcommand=v.set)
-
-        global data_manager
-        errors = data_manager.checkForErrors()
 
         for e in errors:
             text.insert(END, e + "\n\n")
