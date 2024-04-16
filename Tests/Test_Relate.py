@@ -50,3 +50,9 @@ def test_cousin_relatedness(valid_data_manager):
     assert valid_data_manager.calculateRelatedness(14, 15) == 0.0625
 
 #endregion
+
+#region ReturnValues
+
+
+
+#endregion
