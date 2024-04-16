@@ -236,9 +236,9 @@ class EditorPanel(tk.Frame):
         ttk.Label(self.selection_pane, text = "Male:", 
           font = ("Times New Roman", 10)).grid(row=1, 
           column=6) 
-        maleValue = tk.Text(self.selection_pane, 
+        maleValue = tk.Text(self.selection_pane,
                         height = 1, 
-                        width = 5)
+                        width = 8)
         maleValue.grid(row=1, column=7)
 
         # Female Textbox
@@ -247,7 +247,7 @@ class EditorPanel(tk.Frame):
           column=6) 
         femaleValue = tk.Text(self.selection_pane, 
                         height = 1, 
-                        width = 5)
+                        width = 8)
         femaleValue.grid(row=2, column=7)
 
         # Alive Textbox
@@ -256,7 +256,7 @@ class EditorPanel(tk.Frame):
           column=8) 
         aliveValue = tk.Text(self.selection_pane, 
                         height = 1, 
-                        width = 5)
+                        width = 8)
         aliveValue.grid(row=1, column=9)
 
         # Dead Textbox
@@ -265,7 +265,7 @@ class EditorPanel(tk.Frame):
           column=8) 
         deadValue = tk.Text(self.selection_pane, 
                         height = 1, 
-                        width = 5)
+                        width = 8)
         deadValue.grid(row=2, column=9)
 
         # Missing Textbox
@@ -274,7 +274,7 @@ class EditorPanel(tk.Frame):
           column=10) 
         deadValue = tk.Text(self.selection_pane, 
                         height = 1, 
-                        width = 5)
+                        width = 8)
         deadValue.grid(row=1, column=10)
 
         # Check Error Button
@@ -283,6 +283,9 @@ class EditorPanel(tk.Frame):
                                 command = self.load_errors)
         checkErrorButton.grid(row=0, column=6, columnspan=3)
 
+    # TODO: Causes Error because the Datamanager Dataframe does not yet exist
+    # TODO: Ensure errors allow for incest checking
+    # Displays all errors from DataManager
     def load_errors(self):
         v = Scrollbar(self.error_pane, orient='vertical')
         v.pack(side='right', fill='y')
@@ -319,6 +322,7 @@ class EditorPanel(tk.Frame):
             self.table.model.df.columns = colunm_names
 
         self.table.redrawVisible()
+        self.table.statusbar.update()
         
         # Update Dropdown Values
         self.egoDropdown['values'] = self.table.model.df.columns.tolist()
