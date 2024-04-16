@@ -302,22 +302,23 @@ class EditorPanel(tk.Frame):
         
         if self.removeHeader.get(): # Is Checked
             self.firstRow = self.table.getSelectedRowData()
+
             # Update Column Names
-            #visibleDataFrame = self.table.model.df
-            column_names = []
-            for c in self.firstRow:
-                column_names.append(self.firstRow[c])
-        
-            self.table.model.df.columns[0] = column_names
+            self.table.model.df.columns = self.firstRow.values[0]
 
             self.table.deleteRow()
             
         else: # Not Checked
-            #self.table.updateModel(TableModel(self.startingDataFrame))
             self.table.model.df = self.startingDataFrame
+
+            # Reset Columns to Numbers
+            newNames = []
+            for x in range(len(self.table.model.df.columns)):
+                newNames.append(x)
+            self.table.model.df.columns = newNames
+            
             self.table.setSelectedRow(0)
         self.table.redrawVisible()
-        pass
 
 class RelatednessPanel(tk.Frame):
     def __init__(self, parent):
