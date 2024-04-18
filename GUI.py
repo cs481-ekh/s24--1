@@ -120,7 +120,11 @@ class GUI:
         global data_manager
 
         # Return if DataFrame Already Exists
+<<<<<<< HEAD
         if not data_manager.df.empty:
+=======
+        if data_manager.df != None:
+>>>>>>> 20000e5be27ad1a0d08f73f298637d227900f298
             return
         
         # Gain access to Editor Panel
@@ -271,7 +275,10 @@ class EditorPanel(tk.Frame):
         self.maleValue = tk.Entry(self.selection_pane,
                         width = 8)
         self.maleValue.grid(row=1, column=7)
+<<<<<<< HEAD
         self.maleValue.insert(0, "Male") # Default Value
+=======
+>>>>>>> 20000e5be27ad1a0d08f73f298637d227900f298
 
         # Female Entry Box
         ttk.Label(self.selection_pane, text = "Female:", 
@@ -280,7 +287,10 @@ class EditorPanel(tk.Frame):
         self.femaleValue = tk.Entry(self.selection_pane,
                         width = 8)
         self.femaleValue.grid(row=2, column=7)
+<<<<<<< HEAD
         self.femaleValue.insert(0, "Female") # Default Value
+=======
+>>>>>>> 20000e5be27ad1a0d08f73f298637d227900f298
 
         # Alive Textbox
         ttk.Label(self.selection_pane, text = "Alive:", 
@@ -289,7 +299,10 @@ class EditorPanel(tk.Frame):
         self.aliveValue = tk.Entry(self.selection_pane,
                         width = 8)
         self.aliveValue.grid(row=1, column=9)
+<<<<<<< HEAD
         self.aliveValue.insert(0, "Alive") # Default Value
+=======
+>>>>>>> 20000e5be27ad1a0d08f73f298637d227900f298
 
         # Dead Textbox
         ttk.Label(self.selection_pane, text = "Dead:", 
@@ -298,7 +311,10 @@ class EditorPanel(tk.Frame):
         self.deadValue = tk.Entry(self.selection_pane,
                         width = 8)
         self.deadValue.grid(row=2, column=9)
+<<<<<<< HEAD
         self.deadValue.insert(0, "Dead") # Default Value
+=======
+>>>>>>> 20000e5be27ad1a0d08f73f298637d227900f298
 
         # Missing Textbox
         ttk.Label(self.selection_pane, text = "Missing:", 
@@ -307,7 +323,10 @@ class EditorPanel(tk.Frame):
         self.missingValue = tk.Entry(self.selection_pane,
                         width = 8)
         self.missingValue.grid(row=1, column=10)
+<<<<<<< HEAD
         self.missingValue.insert(0, "999") # Default Value
+=======
+>>>>>>> 20000e5be27ad1a0d08f73f298637d227900f298
 
         # Check Error Button
         checkErrorButton = tk.Button(self.selection_pane, 
@@ -374,15 +393,22 @@ class RelatednessPanel(tk.Frame):
         self.pane.pack(fill=BOTH, expand=True)
 
         # Create Button
+<<<<<<< HEAD
         self.calculate_button = Button(self.pane, text="Calculate Relatedness Stats", command=self.display_relatedness_data)
+=======
+        self.calculate_button = Button(self.pane, text="Caculate Relatedness Stats", command=self.display_relatedness_data)
+>>>>>>> 20000e5be27ad1a0d08f73f298637d227900f298
         self.calculate_button.pack(side="bottom")
 
     # Displays Relatedness Data in a Pandastable
     def display_relatedness_data(self):
+<<<<<<< HEAD
         # User Feedback: Alter Cursor because function takes a while
         self.gui.root.config(cursor="watch")
         self.gui.root.update()
 
+=======
+>>>>>>> 20000e5be27ad1a0d08f73f298637d227900f298
         self.gui.build_data_manager()
         # Delete Button
         self.calculate_button.pack_forget()
@@ -394,9 +420,12 @@ class RelatednessPanel(tk.Frame):
         pt.show()
         
         pt.redrawVisible()
+<<<<<<< HEAD
 
         # Return Cursor to normal
         self.gui.root.config(cursor="")
+=======
+>>>>>>> 20000e5be27ad1a0d08f73f298637d227900f298
 
 class FoundersPanel(tk.Frame):
     def __init__(self, parent):
