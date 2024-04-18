@@ -1,3 +1,6 @@
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
+
 import tkinter as tk
 from tkinter import *
 from tkinter import filedialog, ttk, messagebox
@@ -68,7 +71,7 @@ class GUI:
         self.notebook.insert(0, self.editor_panel, text="Editor")
         self.notebook.insert(1, RelatednessPanel(self.notebook, self), text="Relatedness")
         self.notebook.insert(2, FoundersPanel(self.notebook), text="Founders")
-        self.notebook.insert(3, LineagePanel(self.notebook), text="Lineages")
+        self.notebook.insert(3, LineagePanel(self.notebook, self), text="Lineages")
         self.notebook.insert(4, KinGroupPanel(self.notebook), text="Kin Counter")
         self.notebook.insert(5, KinPanel(self.notebook), text="Kin")
         self.notebook.insert(6, GroupPanel(self.notebook), text="Groups")
@@ -117,7 +120,7 @@ class GUI:
         global data_manager
 
         # Return if DataFrame Already Exists
-        if data_manager.df != None:
+        if not data_manager.df.empty:
             return
         
         # Gain access to Editor Panel
@@ -268,6 +271,7 @@ class EditorPanel(tk.Frame):
         self.maleValue = tk.Entry(self.selection_pane,
                         width = 8)
         self.maleValue.grid(row=1, column=7)
+        self.maleValue.insert(0, "Male") # Default Value
 
         # Female Entry Box
         ttk.Label(self.selection_pane, text = "Female:", 
@@ -276,6 +280,7 @@ class EditorPanel(tk.Frame):
         self.femaleValue = tk.Entry(self.selection_pane,
                         width = 8)
         self.femaleValue.grid(row=2, column=7)
+        self.femaleValue.insert(0, "Female") # Default Value
 
         # Alive Textbox
         ttk.Label(self.selection_pane, text = "Alive:", 
@@ -284,6 +289,7 @@ class EditorPanel(tk.Frame):
         self.aliveValue = tk.Entry(self.selection_pane,
                         width = 8)
         self.aliveValue.grid(row=1, column=9)
+        self.aliveValue.insert(0, "Alive") # Default Value
 
         # Dead Textbox
         ttk.Label(self.selection_pane, text = "Dead:", 
@@ -292,6 +298,7 @@ class EditorPanel(tk.Frame):
         self.deadValue = tk.Entry(self.selection_pane,
                         width = 8)
         self.deadValue.grid(row=2, column=9)
+        self.deadValue.insert(0, "Dead") # Default Value
 
         # Missing Textbox
         ttk.Label(self.selection_pane, text = "Missing:", 
@@ -300,6 +307,7 @@ class EditorPanel(tk.Frame):
         self.missingValue = tk.Entry(self.selection_pane,
                         width = 8)
         self.missingValue.grid(row=1, column=10)
+        self.missingValue.insert(0, "999") # Default Value
 
         # Check Error Button
         checkErrorButton = tk.Button(self.selection_pane, 
@@ -366,11 +374,15 @@ class RelatednessPanel(tk.Frame):
         self.pane.pack(fill=BOTH, expand=True)
 
         # Create Button
-        self.calculate_button = Button(self.pane, text="Caculate Relatedness Stats", command=self.display_relatedness_data)
+        self.calculate_button = Button(self.pane, text="Calculate Relatedness Stats", command=self.display_relatedness_data)
         self.calculate_button.pack(side="bottom")
 
     # Displays Relatedness Data in a Pandastable
     def display_relatedness_data(self):
+        # User Feedback: Alter Cursor because function takes a while
+        self.gui.root.config(cursor="watch")
+        self.gui.root.update()
+
         self.gui.build_data_manager()
         # Delete Button
         self.calculate_button.pack_forget()
@@ -382,6 +394,9 @@ class RelatednessPanel(tk.Frame):
         pt.show()
         
         pt.redrawVisible()
+
+        # Return Cursor to normal
+        self.gui.root.config(cursor="")
 
 class FoundersPanel(tk.Frame):
     def __init__(self, parent):
@@ -395,15 +410,42 @@ class FoundersPanel(tk.Frame):
         label.pack()
 
 class LineagePanel(tk.Frame):
-    def __init__(self, parent):
+    def __init__(self, parent, gui):
         super().__init__(parent)
         self.parent = parent
+        self.gui = gui
 
-        self.temp = tk.Frame(self, highlightbackground='Black', highlightthickness=2)
-        self.temp.pack(side = "bottom")
+        self.create_panel_layout()
+    
+    # Sizes the Frame and adds a button
+    def create_panel_layout(self):
+        self.pane = tk.Frame(self, highlightbackground='Black', highlightthickness=2)
+        self.pane.pack(fill=BOTH, expand=True)
 
-        label = Label(self.temp, text="In Development")
-        label.pack()
+        # Create Button
+        self.calculate_button = Button(self.pane, text="Calculate Lineages", command=self.display_lineage_data)
+        self.calculate_button.pack(side="bottom")
+    
+    # Displays Relatedness Data in a Pandastable
+    def display_lineage_data(self):
+        # User Feedback: Alter Cursor because function takes a while
+        self.gui.root.config(cursor="watch")
+        self.gui.root.update()
+
+        self.gui.build_data_manager()
+        # Delete Button
+        self.calculate_button.pack_forget()
+        # Create Pandastable
+        global data_manager
+        self.pane.pack(fill=BOTH,expand=1)
+        self.table = pt = Table(self.pane, dataframe=data_manager.getLineages(),
+                                showtoolbar=False, showstatusbar=True)
+        pt.show()
+        
+        pt.redrawVisible()
+
+        # Return Cursor to normal
+        self.gui.root.config(cursor="")
 
 class KinGroupPanel(tk.Frame):
     def __init__(self, parent):
