@@ -145,16 +145,19 @@ class EditorPanel(tk.Frame):
         super().__init__(parent)
         self.parent = parent
 
+        self.firstRow = None
+        self.removeHeader = BooleanVar()
+
         # Create widgets
         self.create_panel_layout()
 
         # Fill Data Table with DataFrame
         global data_manager
-        tempDF = pd.DataFrame(data_manager.data)
-        self.load_data_frame(tempDF)
+        self.startingDataFrame = pd.DataFrame(data_manager.data)
+        self.load_data_frame(self.startingDataFrame)
 
         # Fills Dropdown Menus with options
-        self.load_selection_menu(tempDF)
+        self.load_selection_menu(self.startingDataFrame)
 
     # Builds Panel Layout for 3 sections; Data, Error, and Selection
     def create_panel_layout(self):
@@ -171,12 +174,12 @@ class EditorPanel(tk.Frame):
     def load_data_frame(self, df):
         self.data_pane.pack(fill=BOTH,expand=1)
         self.table = pt = Table(self.data_pane, dataframe=df,
-                                showtoolbar=False, showstatusbar=True)
+                                showtoolbar=False, showstatusbar=True, )
         pt.show()
 
     def load_selection_menu(self, df):
         # Contains Header Checkbox
-        containsHeading = Checkbutton(self.selection_pane, text="Row one contains column headings")
+        containsHeading = Checkbutton(self.selection_pane, text="Row one contains column headings", variable=self.removeHeader, command=self.toggle_first_row_header)
         containsHeading.grid(row=0, column=0, columnspan=4)
 
         # Check for Incest Checkbox
@@ -188,53 +191,53 @@ class EditorPanel(tk.Frame):
           font = ("Times New Roman", 10)).grid(row=1, 
           column=0) 
         n = tk.StringVar() 
-        egoDropdown = ttk.Combobox(self.selection_pane, width = 10, textvariable = n)
-        egoDropdown['values'] = df.columns.tolist()
-        egoDropdown.grid(row=1, column=1)
+        self.egoDropdown = ttk.Combobox(self.selection_pane, width = 10, textvariable = n)
+        self.egoDropdown['values'] = df.columns.tolist()
+        self.egoDropdown.grid(row=1, column=1)
 
         # Father Dropdown Menu
         ttk.Label(self.selection_pane, text = "Father:", 
           font = ("Times New Roman", 10)).grid(row=1, 
           column=2) 
         n = tk.StringVar() 
-        fatherDropdown = ttk.Combobox(self.selection_pane, width = 10, textvariable = n)
-        fatherDropdown['values'] = df.columns.tolist()
-        fatherDropdown.grid(row=1, column=3)
+        self.fatherDropdown = ttk.Combobox(self.selection_pane, width = 10, textvariable = n)
+        self.fatherDropdown['values'] = df.columns.tolist()
+        self.fatherDropdown.grid(row=1, column=3)
 
         # Mother Dropdown Menu
         ttk.Label(self.selection_pane, text = "Mother:", 
           font = ("Times New Roman", 10)).grid(row=2, 
           column=2) 
         n = tk.StringVar() 
-        motherDropdown = ttk.Combobox(self.selection_pane, width = 10, textvariable = n)
-        motherDropdown['values'] = df.columns.tolist()
-        motherDropdown.grid(row=2, column=3)
+        self.motherDropdown = ttk.Combobox(self.selection_pane, width = 10, textvariable = n)
+        self.motherDropdown['values'] = df.columns.tolist()
+        self.motherDropdown.grid(row=2, column=3)
 
         # Sex Dropdown Menu
         ttk.Label(self.selection_pane, text = "Sex:", 
           font = ("Times New Roman", 10)).grid(row=2, 
           column=0) 
         n = tk.StringVar() 
-        sexDropdown = ttk.Combobox(self.selection_pane, width = 10, textvariable = n)
-        sexDropdown['values'] = df.columns.tolist()
-        sexDropdown.grid(row=2, column=1)
+        self.sexDropdown = ttk.Combobox(self.selection_pane, width = 10, textvariable = n)
+        self.sexDropdown['values'] = df.columns.tolist()
+        self.sexDropdown.grid(row=2, column=1)
 
         # Living Dropdown Menu
         ttk.Label(self.selection_pane, text = "Living:", 
           font = ("Times New Roman", 10)).grid(row=1, 
           column=4) 
         n = tk.StringVar() 
-        livingDropdown = ttk.Combobox(self.selection_pane, width = 10, textvariable = n)
-        livingDropdown['values'] = df.columns.tolist()
-        livingDropdown.grid(row=1, column=5)
+        self.livingDropdown = ttk.Combobox(self.selection_pane, width = 10, textvariable = n)
+        self.livingDropdown['values'] = df.columns.tolist()
+        self.livingDropdown.grid(row=1, column=5)
 
         # Male Textbox
         ttk.Label(self.selection_pane, text = "Male:", 
           font = ("Times New Roman", 10)).grid(row=1, 
           column=6) 
-        maleValue = tk.Text(self.selection_pane, 
+        maleValue = tk.Text(self.selection_pane,
                         height = 1, 
-                        width = 5)
+                        width = 8)
         maleValue.grid(row=1, column=7)
 
         # Female Textbox
@@ -243,7 +246,7 @@ class EditorPanel(tk.Frame):
           column=6) 
         femaleValue = tk.Text(self.selection_pane, 
                         height = 1, 
-                        width = 5)
+                        width = 8)
         femaleValue.grid(row=2, column=7)
 
         # Alive Textbox
@@ -252,7 +255,7 @@ class EditorPanel(tk.Frame):
           column=8) 
         aliveValue = tk.Text(self.selection_pane, 
                         height = 1, 
-                        width = 5)
+                        width = 8)
         aliveValue.grid(row=1, column=9)
 
         # Dead Textbox
@@ -261,7 +264,7 @@ class EditorPanel(tk.Frame):
           column=8) 
         deadValue = tk.Text(self.selection_pane, 
                         height = 1, 
-                        width = 5)
+                        width = 8)
         deadValue.grid(row=2, column=9)
 
         # Missing Textbox
@@ -270,7 +273,7 @@ class EditorPanel(tk.Frame):
           column=10) 
         deadValue = tk.Text(self.selection_pane, 
                         height = 1, 
-                        width = 5)
+                        width = 8)
         deadValue.grid(row=1, column=10)
 
         # Check Error Button
@@ -279,6 +282,9 @@ class EditorPanel(tk.Frame):
                                 command = self.load_errors)
         checkErrorButton.grid(row=0, column=6, columnspan=3)
 
+    # TODO: Causes Error because the Datamanager Dataframe does not yet exist
+    # TODO: Ensure errors allow for incest checking
+    # Displays all errors from DataManager
     def load_errors(self):
         v = Scrollbar(self.error_pane, orient='vertical')
         v.pack(side='right', fill='y')
@@ -290,6 +296,36 @@ class EditorPanel(tk.Frame):
 
         text.pack()
         pass
+
+    # Gets called with Checkbox (First row contains Header)
+    # Updates pandastable dataframe; deletes/adds first row, updates column names
+    def toggle_first_row_header(self):
+        if self.removeHeader.get(): # Is Checked
+            self.table.setSelectedRow(0)
+            self.firstRow = self.table.getSelectedRowData()
+
+            # Update Column Names
+            self.table.model.df.columns = self.firstRow.values[0]
+
+            self.table.deleteRow()
+        else: # Not Checked
+            self.table.model.df = self.startingDataFrame
+
+            # Reset Columns to Numbers
+            column_names = []
+            for x in range(len(self.table.model.df.columns)):
+                column_names.append(x)
+            self.table.model.df.columns = column_names
+
+        self.table.redrawVisible()
+        self.table.statusbar.update()
+        
+        # Update Dropdown Values
+        self.egoDropdown['values'] = self.table.model.df.columns.tolist()
+        self.fatherDropdown['values'] = self.table.model.df.columns.tolist()
+        self.motherDropdown['values'] = self.table.model.df.columns.tolist()
+        self.sexDropdown['values'] = self.table.model.df.columns.tolist()
+        self.livingDropdown['values'] = self.table.model.df.columns.tolist()
 
 class RelatednessPanel(tk.Frame):
     def __init__(self, parent):
