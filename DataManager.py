@@ -12,7 +12,7 @@ class DataManager:
     def __init__(self, filename):
         try:
             self.data = []
-            self.df = None # DataFrame
+            self.df = pd.DataFrame() # DataFrame
             self.graph = None # networkx graph
             self.rm = None # Relate Matrix DataFrame
             self.founders = None # Founders DataFrame
@@ -138,7 +138,14 @@ class DataManager:
 
     #region ========== Module Access =========
 
-    # TODO: Relate Here
+    #region ========= Relatedness =========
+
+    # TODO: Returns Dataframe for Relatedness Tab
+    # Columns Include: Ego, FgALL, FgCON, Number of Relatives, Inbreeding
+    def getRelatednessStats(self):
+        return self.df
+
+    #endregion
 
     #region ========= Founders =========
 
@@ -190,6 +197,7 @@ class DataManager:
 
     def getLineages(self):
         if self.lineages == None:
+            pd.set_option('future.no_silent_downcasting', True) # Needed Because DataFrame contains Arrays in some Columns
             self.lineages = Lineages.findLineages(self.df)
         return self.lineages
 
