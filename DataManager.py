@@ -12,7 +12,7 @@ class DataManager:
     def __init__(self, filename):
         try:
             self.data = []
-            self.df = pd.DataFrame() # DataFrame
+            self.df = None # DataFrame
             self.graph = None # networkx graph
             self.rm = None # Relate Matrix DataFrame
             self.founders = None # Founders DataFrame
@@ -197,7 +197,6 @@ class DataManager:
 
     def getLineages(self):
         if self.lineages == None:
-            pd.set_option('future.no_silent_downcasting', True) # Needed Because DataFrame contains Arrays in some Columns
             self.lineages = Lineages.findLineages(self.df)
         return self.lineages
 
