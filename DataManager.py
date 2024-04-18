@@ -138,7 +138,14 @@ class DataManager:
 
     #region ========== Module Access =========
 
-    # TODO: Relate Here
+    #region ========= Relatedness =========
+
+    # TODO: Returns Dataframe for Relatedness Tab
+    # Columns Include: Ego, FgALL, FgCON, Number of Relatives, Inbreeding
+    def getRelatednessStats(self):
+        return self.df
+
+    #endregion
 
     #region ========= Founders =========
 

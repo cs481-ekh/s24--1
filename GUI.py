@@ -3,7 +3,7 @@ from tkinter import *
 from tkinter import filedialog, ttk, messagebox
 from tkhtmlview import HTMLLabel
 import pandas as pd
-from pandastable import Table, TableModel
+from pandastable import Table, TableModel # Excellent Documentation: https://pandastable.readthedocs.io/en/latest/pandastable.html
 from DataManager import DataManager
 
 data_manager = None
@@ -64,8 +64,9 @@ class GUI:
         "Set up notebook tabs."
         self.ClearTabs()
         self.CreateNotebook()
-        self.notebook.insert(0, EditorPanel(self.notebook), text="Editor")
-        self.notebook.insert(1, RelatednessPanel(self.notebook), text="Relatedness")
+        self.editor_panel = EditorPanel(self.notebook, self)
+        self.notebook.insert(0, self.editor_panel, text="Editor")
+        self.notebook.insert(1, RelatednessPanel(self.notebook, self), text="Relatedness")
         self.notebook.insert(2, FoundersPanel(self.notebook), text="Founders")
         self.notebook.insert(3, LineagePanel(self.notebook), text="Lineages")
         self.notebook.insert(4, KinGroupPanel(self.notebook), text="Kin Counter")
@@ -110,6 +111,33 @@ class GUI:
         else:
             print("Please create a DataFrame first.")
     
+    def build_data_manager(self):
+        global data_manager
+
+        # Return if DataFrame Already Exists
+        if data_manager.df != None:
+            return
+        
+        # Gain access to Editor Panel
+        editor = self.editor_panel
+
+        # Build Parameters for DataManager DataFrame Creation
+        columns = [editor.egoColumnValue.get(),\
+                   editor.fatherColumnValue.get(),\
+                   editor.motherColumnValue.get(),\
+                   editor.sexColumnValue.get(),\
+                   editor.livingColumnValue.get()]
+        values = [editor.maleValue.get(),\
+                  editor.femaleValue.get(),\
+                  editor.aliveValue.get(),\
+                  editor.deadValue.get(),\
+                  editor.missingValue.get()]
+        headerCheckbox = editor.removeHeader.get()
+
+        # Call createPandasDataFrame()        
+        data_manager.createPandasDataFrame(columns, values, headerCheckbox)
+
+        
     # Loads Help Content into Help Tab
     # Runs when Program Boots
     def add_help_content(self):
@@ -141,9 +169,10 @@ class GUI:
         help_label.grid(row=0, column=0, sticky="nsew")
 
 class EditorPanel(tk.Frame):
-    def __init__(self, parent):
+    def __init__(self, parent, gui):
         super().__init__(parent)
         self.parent = parent
+        self.gui = gui
 
         self.firstRow = None
         self.removeHeader = BooleanVar()
@@ -174,7 +203,7 @@ class EditorPanel(tk.Frame):
     def load_data_frame(self, df):
         self.data_pane.pack(fill=BOTH,expand=1)
         self.table = pt = Table(self.data_pane, dataframe=df,
-                                showtoolbar=False, showstatusbar=True, )
+                                showtoolbar=False, showstatusbar=True)
         pt.show()
 
     def load_selection_menu(self, df):
@@ -190,8 +219,8 @@ class EditorPanel(tk.Frame):
         ttk.Label(self.selection_pane, text = "Ego :", 
           font = ("Times New Roman", 10)).grid(row=1, 
           column=0) 
-        n = tk.StringVar() 
-        self.egoDropdown = ttk.Combobox(self.selection_pane, width = 10, textvariable = n)
+        self.egoColumnValue = tk.StringVar()
+        self.egoDropdown = ttk.Combobox(self.selection_pane, width = 10, textvariable = self.egoColumnValue)
         self.egoDropdown['values'] = df.columns.tolist()
         self.egoDropdown.grid(row=1, column=1)
 
@@ -199,8 +228,8 @@ class EditorPanel(tk.Frame):
         ttk.Label(self.selection_pane, text = "Father:", 
           font = ("Times New Roman", 10)).grid(row=1, 
           column=2) 
-        n = tk.StringVar() 
-        self.fatherDropdown = ttk.Combobox(self.selection_pane, width = 10, textvariable = n)
+        self.fatherColumnValue = tk.StringVar()
+        self.fatherDropdown = ttk.Combobox(self.selection_pane, width = 10, textvariable = self.fatherColumnValue)
         self.fatherDropdown['values'] = df.columns.tolist()
         self.fatherDropdown.grid(row=1, column=3)
 
@@ -208,8 +237,8 @@ class EditorPanel(tk.Frame):
         ttk.Label(self.selection_pane, text = "Mother:", 
           font = ("Times New Roman", 10)).grid(row=2, 
           column=2) 
-        n = tk.StringVar() 
-        self.motherDropdown = ttk.Combobox(self.selection_pane, width = 10, textvariable = n)
+        self.motherColumnValue = tk.StringVar()
+        self.motherDropdown = ttk.Combobox(self.selection_pane, width = 10, textvariable = self.motherColumnValue)
         self.motherDropdown['values'] = df.columns.tolist()
         self.motherDropdown.grid(row=2, column=3)
 
@@ -217,8 +246,8 @@ class EditorPanel(tk.Frame):
         ttk.Label(self.selection_pane, text = "Sex:", 
           font = ("Times New Roman", 10)).grid(row=2, 
           column=0) 
-        n = tk.StringVar() 
-        self.sexDropdown = ttk.Combobox(self.selection_pane, width = 10, textvariable = n)
+        self.sexColumnValue = tk.StringVar()
+        self.sexDropdown = ttk.Combobox(self.selection_pane, width = 10, textvariable = self.sexColumnValue)
         self.sexDropdown['values'] = df.columns.tolist()
         self.sexDropdown.grid(row=2, column=1)
 
@@ -226,55 +255,50 @@ class EditorPanel(tk.Frame):
         ttk.Label(self.selection_pane, text = "Living:", 
           font = ("Times New Roman", 10)).grid(row=1, 
           column=4) 
-        n = tk.StringVar() 
-        self.livingDropdown = ttk.Combobox(self.selection_pane, width = 10, textvariable = n)
+        self.livingColumnValue = tk.StringVar()
+        self.livingDropdown = ttk.Combobox(self.selection_pane, width = 10, textvariable = self.livingColumnValue)
         self.livingDropdown['values'] = df.columns.tolist()
         self.livingDropdown.grid(row=1, column=5)
 
-        # Male Textbox
+        # Male Entry Box
         ttk.Label(self.selection_pane, text = "Male:", 
           font = ("Times New Roman", 10)).grid(row=1, 
           column=6) 
-        maleValue = tk.Text(self.selection_pane,
-                        height = 1, 
+        self.maleValue = tk.Entry(self.selection_pane,
                         width = 8)
-        maleValue.grid(row=1, column=7)
+        self.maleValue.grid(row=1, column=7)
 
-        # Female Textbox
+        # Female Entry Box
         ttk.Label(self.selection_pane, text = "Female:", 
           font = ("Times New Roman", 10)).grid(row=2, 
           column=6) 
-        femaleValue = tk.Text(self.selection_pane, 
-                        height = 1, 
+        self.femaleValue = tk.Entry(self.selection_pane,
                         width = 8)
-        femaleValue.grid(row=2, column=7)
+        self.femaleValue.grid(row=2, column=7)
 
         # Alive Textbox
         ttk.Label(self.selection_pane, text = "Alive:", 
           font = ("Times New Roman", 10)).grid(row=1, 
           column=8) 
-        aliveValue = tk.Text(self.selection_pane, 
-                        height = 1, 
+        self.aliveValue = tk.Entry(self.selection_pane,
                         width = 8)
-        aliveValue.grid(row=1, column=9)
+        self.aliveValue.grid(row=1, column=9)
 
         # Dead Textbox
         ttk.Label(self.selection_pane, text = "Dead:", 
           font = ("Times New Roman", 10)).grid(row=2, 
           column=8) 
-        deadValue = tk.Text(self.selection_pane, 
-                        height = 1, 
+        self.deadValue = tk.Entry(self.selection_pane,
                         width = 8)
-        deadValue.grid(row=2, column=9)
+        self.deadValue.grid(row=2, column=9)
 
         # Missing Textbox
         ttk.Label(self.selection_pane, text = "Missing:", 
           font = ("Times New Roman", 10)).grid(row=2, 
           column=10) 
-        deadValue = tk.Text(self.selection_pane, 
-                        height = 1, 
+        self.missingValue = tk.Entry(self.selection_pane,
                         width = 8)
-        deadValue.grid(row=1, column=10)
+        self.missingValue.grid(row=1, column=10)
 
         # Check Error Button
         checkErrorButton = tk.Button(self.selection_pane, 
@@ -328,15 +352,33 @@ class EditorPanel(tk.Frame):
         self.livingDropdown['values'] = self.table.model.df.columns.tolist()
 
 class RelatednessPanel(tk.Frame):
-    def __init__(self, parent):
+    def __init__(self, parent, gui):
         super().__init__(parent)
         self.parent = parent
+        self.gui = gui
 
-        self.temp = tk.Frame(self, highlightbackground='Black', highlightthickness=2)
-        self.temp.pack()
+        self.create_panel_layout()
+    
+    def create_panel_layout(self):
+        self.pane = tk.Frame(self, highlightbackground='Black', highlightthickness=2)
+        self.pane.pack(fill=BOTH, expand=True)
 
-        label = Label(self.temp, text="In Development")
-        label.pack()
+        # Create Button
+        self.calculate_button = Button(self.pane, text="Caculate Relatedness Stats", command=self.display_relatedness_data)
+        self.calculate_button.pack(side="bottom")
+
+    def display_relatedness_data(self):
+        self.gui.build_data_manager()
+        # Delete Button
+        self.calculate_button.pack_forget()
+        # Create Pandastable
+        global data_manager
+        self.pane.pack(fill=BOTH,expand=1)
+        self.table = pt = Table(self.pane, dataframe=data_manager.getRelatednessStats(),
+                                showtoolbar=False, showstatusbar=True)
+        pt.show()
+        
+        pt.redrawVisible()
 
 class FoundersPanel(tk.Frame):
     def __init__(self, parent):
