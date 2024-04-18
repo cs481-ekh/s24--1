@@ -111,6 +111,8 @@ class GUI:
         else:
             print("Please create a DataFrame first.")
     
+    # Called before any Calculation in all Tabs except Editor
+    # Builds the backend DataFrame based on User Input
     def build_data_manager(self):
         global data_manager
 
@@ -136,7 +138,6 @@ class GUI:
 
         # Call createPandasDataFrame()        
         data_manager.createPandasDataFrame(columns, values, headerCheckbox)
-
         
     # Loads Help Content into Help Tab
     # Runs when Program Boots
@@ -359,6 +360,7 @@ class RelatednessPanel(tk.Frame):
 
         self.create_panel_layout()
     
+    # Sizes the Frame and adds a button
     def create_panel_layout(self):
         self.pane = tk.Frame(self, highlightbackground='Black', highlightthickness=2)
         self.pane.pack(fill=BOTH, expand=True)
@@ -367,6 +369,7 @@ class RelatednessPanel(tk.Frame):
         self.calculate_button = Button(self.pane, text="Caculate Relatedness Stats", command=self.display_relatedness_data)
         self.calculate_button.pack(side="bottom")
 
+    # Displays Relatedness Data in a Pandastable
     def display_relatedness_data(self):
         self.gui.build_data_manager()
         # Delete Button
