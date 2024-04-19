@@ -3,7 +3,7 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 
 import tkinter as tk
 from tkinter import *
-from tkinter import filedialog, ttk, messagebox
+from tkinter import filedialog, ttk, messagebox, scrolledtext
 from tkhtmlview import HTMLLabel
 import pandas as pd
 from pandastable import Table, TableModel # Excellent Documentation: https://pandastable.readthedocs.io/en/latest/pandastable.html
@@ -180,6 +180,7 @@ class EditorPanel(tk.Frame):
 
         self.firstRow = None
         self.removeHeader = BooleanVar()
+        self.includeIncest = BooleanVar()
 
         # Create widgets
         self.create_panel_layout()
@@ -216,7 +217,7 @@ class EditorPanel(tk.Frame):
         containsHeading.grid(row=0, column=0, columnspan=4)
 
         # Check for Incest Checkbox
-        incest = Checkbutton(self.selection_pane, text="Incest")
+        incest = Checkbutton(self.selection_pane, text="Incest", variable=self.includeIncest, command=self.load_errors)
         incest.grid(row=0, column=10)
 
         # Ego Dropdown Menu
@@ -322,12 +323,17 @@ class EditorPanel(tk.Frame):
         v = Scrollbar(self.error_pane, orient='vertical')
         v.pack(side='right', fill='y')
 
-        text = Text(self.error_pane, yscrollcommand=v.set)
+        errordisplay = scrolledtext(self.error_pane, yscrollcommand=v.set)
 
-        for e in errors:
-            text.insert(END, e + "\n\n")
+        self.gui.build_data_manager()
 
-        text.pack()
+        global data_manager
+        # Use ScrolledText
+        for e in data_manager.checkForErrors(self.includeIncest.get()):
+            errordisplay.insert(tk.INSERT, e + "\n")
+
+        errordisplay.pack()
+        errordisplay.configure(state ='disabled') 
         pass
 
     # Gets called with Checkbox (First row contains Header)

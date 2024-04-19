@@ -81,7 +81,7 @@ class DataManager:
     
     # Validates DataFrame Logic
     # TODO: Create Incest Warnings
-    def checkForErrors(self):
+    def checkForErrors(self, includeIncest):
         # Initialize a list to store error messages
         error_messages = []
 
@@ -123,6 +123,10 @@ class DataManager:
             for ego in errors_invalid_sex_egos['Ego']:
                 error_messages.append(f"Error for Ego {ego}: Living colunm is an unexpected value.")
 
+        if includeIncest:
+            print("Includes Incest is Checked")
+            # TODO: Build Incest Errors
+            pass
 
         # Add additional checks and error messages as needed.
                 
