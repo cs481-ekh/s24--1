@@ -130,8 +130,8 @@ class DataManager:
 
         # Add additional checks and error messages as needed.
                 
-        for line in error_messages:
-            print(line)
+        if len(error_messages) == 0:
+            error_messages.append("No errors found!")
 
         # Return all error messages
         return error_messages

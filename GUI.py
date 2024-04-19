@@ -320,9 +320,10 @@ class EditorPanel(tk.Frame):
     # TODO: Ensure errors allow for incest checking
     # Displays all errors from DataManager
     def load_errors(self):
-        v = Scrollbar(self.error_pane, orient='vertical')
-        v.pack(side='right', fill='y')
+        #v = Scrollbar(self.error_pane, orient='vertical')
+        #v.pack(side='right', fill='y')
 
+        # TODO: Set reasonable static size
         errordisplay = scrolledtext.ScrolledText(self.error_pane)
 
         self.gui.build_data_manager()
@@ -331,6 +332,8 @@ class EditorPanel(tk.Frame):
         # Use ScrolledText
         for e in data_manager.checkForErrors(self.includeIncest.get()):
             errordisplay.insert(tk.INSERT, e + "\n")
+
+        print(data_manager.checkForErrors(self.includeIncest.get()))
 
         errordisplay.pack()
         errordisplay.configure(state ='disabled') 
