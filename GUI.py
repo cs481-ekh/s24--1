@@ -70,7 +70,7 @@ class GUI:
         self.editor_panel = EditorPanel(self.notebook, self)
         self.notebook.insert(0, self.editor_panel, text="Editor")
         self.notebook.insert(1, RelatednessPanel(self.notebook, self), text="Relatedness")
-        self.notebook.insert(2, FoundersPanel(self.notebook), text="Founders")
+        self.notebook.insert(2, FoundersPanel(self.notebook, self), text="Founders")
         self.notebook.insert(3, LineagePanel(self.notebook, self), text="Lineages")
         self.notebook.insert(4, KinGroupPanel(self.notebook), text="Kin Counter")
         self.notebook.insert(5, KinPanel(self.notebook), text="Kin")
@@ -399,15 +399,42 @@ class RelatednessPanel(tk.Frame):
         self.gui.root.config(cursor="")
 
 class FoundersPanel(tk.Frame):
-    def __init__(self, parent):
+    def __init__(self, parent, gui):
         super().__init__(parent)
         self.parent = parent
+        self.gui = gui
 
-        self.temp = tk.Frame(self, highlightbackground='Black', highlightthickness=2)
-        self.temp.pack(side = "bottom")
+        self.create_panel_layout()
+    
+    # Sizes the Frame and adds a button
+    def create_panel_layout(self):
+        self.pane = tk.Frame(self, highlightbackground='Black', highlightthickness=2)
+        self.pane.pack(fill=BOTH, expand=True)
 
-        label = Label(self.temp, text="In Development")
-        label.pack()
+        # Create Button
+        self.calculate_button = Button(self.pane, text="Calculate Founders", command=self.display_founders_data)
+        self.calculate_button.pack(side="bottom")
+
+    # Displays Relatedness Data in a Pandastable
+    def display_founders_data(self):
+        # User Feedback: Alter Cursor because function takes a while
+        self.gui.root.config(cursor="watch")
+        self.gui.root.update()
+
+        self.gui.build_data_manager()
+        # Delete Button
+        self.calculate_button.pack_forget()
+        # Create Pandastable
+        global data_manager
+        self.pane.pack(fill=BOTH,expand=1)
+        self.table = pt = Table(self.pane, dataframe=data_manager.getFounders(),
+                                showtoolbar=False, showstatusbar=True)
+        pt.show()
+        
+        pt.redrawVisible()
+
+        # Return Cursor to normal
+        self.gui.root.config(cursor="")
 
 class LineagePanel(tk.Frame):
     def __init__(self, parent, gui):
