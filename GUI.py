@@ -323,7 +323,7 @@ class EditorPanel(tk.Frame):
         v = Scrollbar(self.error_pane, orient='vertical')
         v.pack(side='right', fill='y')
 
-        errordisplay = scrolledtext(self.error_pane, yscrollcommand=v.set)
+        errordisplay = scrolledtext.ScrolledText(self.error_pane)
 
         self.gui.build_data_manager()
 
