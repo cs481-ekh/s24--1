@@ -201,6 +201,8 @@ class EditorPanel(tk.Frame):
         self.data_pane.pack(side = "left")
         self.error_pane = tk.Frame(self.upper, highlightbackground='Black', highlightthickness=2, height=height, width=width * 0.3)
         self.error_pane.pack(side = "right")
+        self.errordisplay = scrolledtext.ScrolledText(self.error_pane) # Initialized here to prevent duplication
+        self.errordisplay.pack()
         self.selection_pane = tk.Frame(self, highlightbackground='Black', highlightthickness=2, height=height * 0.3, width=width)
         self.selection_pane.pack(side = "bottom", fill=BOTH)
 
@@ -217,7 +219,7 @@ class EditorPanel(tk.Frame):
         containsHeading.grid(row=0, column=0, columnspan=4)
 
         # Check for Incest Checkbox
-        incest = Checkbutton(self.selection_pane, text="Incest", variable=self.includeIncest, command=self.load_errors)
+        incest = Checkbutton(self.selection_pane, text="Incest", variable=self.includeIncest)
         incest.grid(row=0, column=10)
 
         # Ego Dropdown Menu
@@ -316,28 +318,21 @@ class EditorPanel(tk.Frame):
                                 command = self.load_errors)
         checkErrorButton.grid(row=0, column=6, columnspan=3)
 
-    # TODO: Causes Error because the Datamanager Dataframe does not yet exist
-    # TODO: Ensure errors allow for incest checking
     # Displays all errors from DataManager
     def load_errors(self):
-        #v = Scrollbar(self.error_pane, orient='vertical')
-        #v.pack(side='right', fill='y')
-
-        # TODO: Set reasonable static size
-        errordisplay = scrolledtext.ScrolledText(self.error_pane)
-
+        # Ensure DataManager is built properly
         self.gui.build_data_manager()
 
+        # Removes old errors from previous button press
+        self.errordisplay.delete('1.0', END)
+
+        # Gets errors and displays them
         global data_manager
-        # Use ScrolledText
         for e in data_manager.checkForErrors(self.includeIncest.get()):
-            errordisplay.insert(tk.INSERT, e + "\n")
+            self.errordisplay.insert(tk.INSERT, e + "\n")
 
-        print(data_manager.checkForErrors(self.includeIncest.get()))
-
-        errordisplay.pack()
-        errordisplay.configure(state ='disabled') 
-        pass
+        # Blocks user from editing errors box
+        self.errordisplay.configure(state ='disabled')
 
     # Gets called with Checkbox (First row contains Header)
     # Updates pandastable dataframe; deletes/adds first row, updates column names
