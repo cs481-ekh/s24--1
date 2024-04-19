@@ -328,7 +328,10 @@ class EditorPanel(tk.Frame):
 
         # Gets errors and displays them
         global data_manager
-        for e in data_manager.checkForErrors(self.includeIncest.get()):
+        errors = data_manager.checkForErrors(self.includeIncest.get())
+        if len(errors) == 0:
+            errors.append("No errors found!")
+        for e in errors:
             self.errordisplay.insert(tk.INSERT, e + "\n")
 
         # Blocks user from editing errors box

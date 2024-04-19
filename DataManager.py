@@ -81,7 +81,7 @@ class DataManager:
     
     # Validates DataFrame Logic
     # TODO: Create Incest Warnings
-    def checkForErrors(self, includeIncest):
+    def checkForErrors(self, includeIncest=False):
         # Initialize a list to store error messages
         error_messages = []
 
@@ -128,10 +128,7 @@ class DataManager:
             # TODO: Build Incest Errors
             pass
 
-        # Add additional checks and error messages as needed.
-                
-        if len(error_messages) == 0:
-            error_messages.append("No errors found!")
+        # TODO: Add additional checks and error messages as needed.
 
         # Return all error messages
         return error_messages
