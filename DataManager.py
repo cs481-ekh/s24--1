@@ -203,7 +203,13 @@ class DataManager:
 
     #endregion
         
-    # TODO: Kin Counter Here
+    #region ========= Kin Counter =========
+
+    def getKinCounts(self, options):
+        print(options)
+        return self.df # TODO: Replace with actual return dataframe
+
+    #endregion
         
     # TODO: Kin Here
         
