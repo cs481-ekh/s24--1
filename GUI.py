@@ -467,7 +467,7 @@ class LineagePanel(tk.Frame):
             
             pt.redrawVisible()
         except Exception as e:
-            print("Error with the Relatedness Panel: " + e)
+            print("Error with the Lineages Panel: " + e)
         finally:
             # Return Cursor to normal
             self.gui.root.config(cursor="")
