@@ -98,21 +98,6 @@ class GUI:
     def save_as_file(self):
         # Add logic to save file as
         print("Save As is In Development")
-
-    def create_dataframe(self):
-        if self.data_manager:
-            self.data_manager.createPandasDataFrame()
-            print("DataFrame created successfully.")
-        else:
-            print("Please load a CSV file first.")
-
-    def check_errors(self):
-        if self.data_manager:
-            errors = self.data_manager.checkForErrors()
-            if not errors:
-                print("No errors found.")
-        else:
-            print("Please create a DataFrame first.")
     
     # Called before any Calculation in all Tabs except Editor
     # Builds the backend DataFrame based on User Input
@@ -208,11 +193,11 @@ class EditorPanel(tk.Frame):
     def create_panel_layout(self):
         self.upper = tk.Frame(self)
         self.upper.pack(side = 'top')
-        self.data_pane = tk.Frame(self.upper, highlightbackground='Black', highlightthickness=2)
+        self.data_pane = tk.Frame(self.upper)
         self.data_pane.pack(side = "left")
-        self.error_pane = tk.Frame(self.upper, highlightbackground='Black', highlightthickness=2, height=height, width=width * 0.3)
+        self.error_pane = tk.Frame(self.upper, height=height, width=width * 0.3)
         self.error_pane.pack(side = "right")
-        self.selection_pane = tk.Frame(self, highlightbackground='Black', highlightthickness=2, height=height * 0.3, width=width)
+        self.selection_pane = tk.Frame(self, height=height * 0.3, width=width)
         self.selection_pane.pack(side = "bottom", fill=BOTH)
 
     # Loads dataframe into grid
@@ -227,9 +212,15 @@ class EditorPanel(tk.Frame):
         containsHeading = Checkbutton(self.selection_pane, text="Row one contains column headings", variable=self.removeHeader, command=self.toggle_first_row_header)
         containsHeading.grid(row=0, column=0, columnspan=4)
 
-        # Check for Incest Checkbox
+        # Check Error Button
+        checkErrorButton = tk.Button(self.selection_pane, 
+                                text = "Check Errors",  
+                                command = self.load_errors)
+        checkErrorButton.grid(row=0, column=8, columnspan=2)
+
+        # Error Check includes Incest Checkbox
         incest = Checkbutton(self.selection_pane, text="Incest")
-        incest.grid(row=0, column=10)
+        incest.grid(row=0, column=11)
 
         # Ego Dropdown Menu
         ttk.Label(self.selection_pane, text = "Ego :", 
@@ -314,18 +305,12 @@ class EditorPanel(tk.Frame):
 
         # Missing Textbox
         ttk.Label(self.selection_pane, text = "Missing:", 
-          font = ("Times New Roman", 10)).grid(row=2, 
+          font = ("Times New Roman", 10)).grid(row=1, 
           column=10) 
         self.missingValue = tk.Entry(self.selection_pane,
                         width = 8)
-        self.missingValue.grid(row=1, column=10)
+        self.missingValue.grid(row=1, column=11)
         self.missingValue.insert(0, "9999") # Default Value
-
-        # Check Error Button
-        checkErrorButton = tk.Button(self.selection_pane, 
-                                text = "Check Errors",  
-                                command = self.load_errors)
-        checkErrorButton.grid(row=0, column=6, columnspan=3)
 
     # TODO: Causes Error because the Datamanager Dataframe does not yet exist
     # TODO: Ensure errors allow for incest checking
@@ -410,13 +395,15 @@ class RelatednessPanel(tk.Frame):
             self.gui.root.config(cursor="watch")
             self.gui.root.update()
 
-            if self.gui.build_data_manager() == None:
+            self.gui.build_data_manager()
+
+            global data_manager
+            if data_manager.df.empty:
                 return
 
             # Delete Button
             self.calculate_button.pack_forget()
             # Create Pandastable
-            global data_manager
             self.pane.pack(fill=BOTH,expand=1)
             self.table = pt = Table(self.pane, dataframe=data_manager.getRelatednessStats(),
                                     showtoolbar=False, showstatusbar=True)
@@ -464,13 +451,15 @@ class LineagePanel(tk.Frame):
             self.gui.root.config(cursor="watch")
             self.gui.root.update()
 
-            if self.gui.build_data_manager() == None:
+            self.gui.build_data_manager()
+
+            global data_manager
+            if data_manager.df.empty:
                 return
             
             # Delete Button
             self.calculate_button.pack_forget()
             # Create Pandastable
-            global data_manager
             self.pane.pack(fill=BOTH,expand=1)
             self.table = pt = Table(self.pane, dataframe=data_manager.getLineages(),
                                     showtoolbar=False, showstatusbar=True)
