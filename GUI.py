@@ -516,7 +516,7 @@ class KinCounterPanel(tk.Frame):
         runButton = tk.Button(self.selection_pane, 
                                 text = "Run",  
                                 command = self.display_kin_counter_results)
-        runButton.grid(row=0, column=6, columnspan=3)
+        runButton.grid(row=4, column=0, columnspan=3)
 
     # Displays Relatedness Data in a Pandastable
     def display_kin_counter_results(self):
