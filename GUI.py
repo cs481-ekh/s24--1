@@ -98,49 +98,46 @@ class GUI:
     def save_as_file(self):
         # Add logic to save file as
         print("Save As is In Development")
-
-    def create_dataframe(self):
-        if self.data_manager:
-            self.data_manager.createPandasDataFrame()
-            print("DataFrame created successfully.")
-        else:
-            print("Please load a CSV file first.")
-
-    def check_errors(self):
-        if self.data_manager:
-            errors = self.data_manager.checkForErrors()
-            if not errors:
-                print("No errors found.")
-        else:
-            print("Please create a DataFrame first.")
     
     # Called before any Calculation in all Tabs except Editor
     # Builds the backend DataFrame based on User Input
+    # Returns True if no problems
     def build_data_manager(self):
-        global data_manager
+        try:
+            global data_manager
 
-        # Return if DataFrame Already Exists
-        if not data_manager.df.empty:
-            return
-        
-        # Gain access to Editor Panel
-        editor = self.editor_panel
+            # Return if DataFrame Already Exists
+            if not data_manager.df.empty:
+                return
+            
+            # Gain access to Editor Panel
+            editor = self.editor_panel
 
-        # Build Parameters for DataManager DataFrame Creation
-        columns = [editor.egoColumnValue.get(),
-                   editor.fatherColumnValue.get(),
-                   editor.motherColumnValue.get(),
-                   editor.sexColumnValue.get(),
-                   editor.livingColumnValue.get()]
-        values = [editor.maleValue.get(),
-                  editor.femaleValue.get(),
-                  editor.aliveValue.get(),
-                  editor.deadValue.get(),
-                  editor.missingValue.get()]
-        headerCheckbox = editor.removeHeader.get()
+            # Build Parameters for DataManager DataFrame Creation
+            columns = [editor.egoColumnValue.get(),
+                       editor.fatherColumnValue.get(),
+                       editor.motherColumnValue.get(),
+                       editor.sexColumnValue.get(),
+                       editor.livingColumnValue.get()]
+            values = [editor.maleValue.get(),
+                      editor.femaleValue.get(),
+                      editor.aliveValue.get(),
+                      editor.deadValue.get(),
+                      editor.missingValue.get()]
+            headerCheckbox = editor.removeHeader.get()
 
-        # Call createPandasDataFrame()        
-        data_manager.createPandasDataFrame(columns, values, headerCheckbox)
+            # Input Validation
+            if '' in columns:
+                messagebox.showerror("Invalid Input", "At least one of the Colunms is not selected in the Editor")
+                return
+            if '' in values:
+                messagebox.showerror("Invalid Input", "At least one of the Expected Values is blank in the Editor")
+                return
+
+            # Call createPandasDataFrame()        
+            return data_manager.createPandasDataFrame(columns, values, headerCheckbox)
+        except Exception as e:
+            print("There was a problem building the data_manager: " + e)
         
     # Loads Help Content into Help Tab
     # Runs when Program Boots
@@ -197,13 +194,13 @@ class EditorPanel(tk.Frame):
     def create_panel_layout(self):
         self.upper = tk.Frame(self)
         self.upper.pack(side = 'top')
-        self.data_pane = tk.Frame(self.upper, highlightbackground='Black', highlightthickness=2)
+        self.data_pane = tk.Frame(self.upper)
         self.data_pane.pack(side = "left")
-        self.error_pane = tk.Frame(self.upper, highlightbackground='Black', highlightthickness=2, height=height, width=width * 0.3)
+        self.error_pane = tk.Frame(self.upper, height=height, width=width * 0.3)
         self.error_pane.pack(side = "right")
-        self.errordisplay = scrolledtext.ScrolledText(self.error_pane) # Initialized here to prevent duplication
+        self.errordisplay = scrolledtext.ScrolledText(self.error_pane, width=20) # Initialized here to prevent duplication
         self.errordisplay.pack()
-        self.selection_pane = tk.Frame(self, highlightbackground='Black', highlightthickness=2, height=height * 0.3, width=width)
+        self.selection_pane = tk.Frame(self, height=height * 0.3, width=width)
         self.selection_pane.pack(side = "bottom", fill=BOTH)
 
     # Loads dataframe into grid
@@ -218,9 +215,15 @@ class EditorPanel(tk.Frame):
         containsHeading = Checkbutton(self.selection_pane, text="Row one contains column headings", variable=self.removeHeader, command=self.toggle_first_row_header)
         containsHeading.grid(row=0, column=0, columnspan=4)
 
-        # Check for Incest Checkbox
+        # Check Error Button
+        checkErrorButton = tk.Button(self.selection_pane, 
+                                text = "Check Errors",  
+                                command = self.load_errors)
+        checkErrorButton.grid(row=0, column=8, columnspan=2)
+
+        # Error Check includes Incest Checkbox
         incest = Checkbutton(self.selection_pane, text="Incest", variable=self.includeIncest)
-        incest.grid(row=0, column=10)
+        incest.grid(row=0, column=11)
 
         # Ego Dropdown Menu
         ttk.Label(self.selection_pane, text = "Ego :", 
@@ -292,7 +295,7 @@ class EditorPanel(tk.Frame):
         self.aliveValue = tk.Entry(self.selection_pane,
                         width = 8)
         self.aliveValue.grid(row=1, column=9)
-        self.aliveValue.insert(0, "Alive") # Default Value
+        self.aliveValue.insert(0, "1") # Default Value
 
         # Dead Textbox
         ttk.Label(self.selection_pane, text = "Dead:", 
@@ -301,41 +304,49 @@ class EditorPanel(tk.Frame):
         self.deadValue = tk.Entry(self.selection_pane,
                         width = 8)
         self.deadValue.grid(row=2, column=9)
-        self.deadValue.insert(0, "Dead") # Default Value
+        self.deadValue.insert(0, "0") # Default Value
 
         # Missing Textbox
         ttk.Label(self.selection_pane, text = "Missing:", 
-          font = ("Times New Roman", 10)).grid(row=2, 
+          font = ("Times New Roman", 10)).grid(row=1, 
           column=10) 
         self.missingValue = tk.Entry(self.selection_pane,
                         width = 8)
-        self.missingValue.grid(row=1, column=10)
-        self.missingValue.insert(0, "999") # Default Value
-
-        # Check Error Button
-        checkErrorButton = tk.Button(self.selection_pane, 
-                                text = "Check Errors",  
-                                command = self.load_errors)
-        checkErrorButton.grid(row=0, column=6, columnspan=3)
+        self.missingValue.grid(row=1, column=11)
+        self.missingValue.insert(0, "9999") # Default Value
 
     # Displays all errors from DataManager
     def load_errors(self):
-        # Ensure DataManager is built properly
-        self.gui.build_data_manager()
+        try:
+            # User Feedback: Alter Cursor because function takes a while
+            self.gui.root.config(cursor="watch")
+            self.gui.root.update()
 
-        # Removes old errors from previous button press
-        self.errordisplay.delete('1.0', END)
+            # Ensure DataManager is built properly
+            self.gui.build_data_manager()
 
-        # Gets errors and displays them
-        global data_manager
-        errors = data_manager.checkForErrors(self.includeIncest.get())
-        if len(errors) == 0:
-            errors.append("No errors found!")
-        for e in errors:
-            self.errordisplay.insert(tk.INSERT, e + "\n")
+            global data_manager
+            if data_manager.df.empty:
+                return
 
-        # Blocks user from editing errors box
-        self.errordisplay.configure(state ='disabled')
+            # Removes old errors from previous button press
+            self.errordisplay.delete('1.0', END)
+
+            # Gets errors and displays them
+            errors = data_manager.checkForErrors(self.includeIncest.get())
+            if len(errors) == 0:
+                errors.append("No errors found!")
+            for e in errors:
+                self.errordisplay.insert(tk.INSERT, e + "\n")
+
+            # Blocks user from editing errors box
+            self.errordisplay.configure(state ='disabled')
+
+        except Exception as e:
+            print("Error with the Editor Panel: " + e)
+        finally:
+            # Return Cursor to normal
+            self.gui.root.config(cursor="")
 
     # Gets called with Checkbox (First row contains Header)
     # Updates pandastable dataframe; deletes/adds first row, updates column names
@@ -360,12 +371,26 @@ class EditorPanel(tk.Frame):
         self.table.redrawVisible()
         self.table.statusbar.update()
         
+        # Preserve Current Selections
+        egoCurrent = self.egoDropdown.current()
+        fatherCurrent = self.fatherDropdown.current()
+        motherCurrent = self.motherDropdown.current()
+        sexCurrent = self.sexDropdown.current()
+        livingCurrent = self.livingDropdown.current()
+        
         # Update Dropdown Values
         self.egoDropdown['values'] = self.table.model.df.columns.tolist()
         self.fatherDropdown['values'] = self.table.model.df.columns.tolist()
         self.motherDropdown['values'] = self.table.model.df.columns.tolist()
         self.sexDropdown['values'] = self.table.model.df.columns.tolist()
         self.livingDropdown['values'] = self.table.model.df.columns.tolist()
+
+        # Reapply Preserved Selections
+        if egoCurrent > -1: self.egoDropdown.current(egoCurrent)
+        if fatherCurrent > -1: self.fatherDropdown.current(fatherCurrent)
+        if motherCurrent > -1: self.motherDropdown.current(motherCurrent)
+        if sexCurrent > -1: self.sexDropdown.current(sexCurrent)
+        if livingCurrent > -1: self.livingDropdown.current(livingCurrent)
 
 class RelatednessPanel(tk.Frame):
     def __init__(self, parent, gui):
@@ -386,24 +411,32 @@ class RelatednessPanel(tk.Frame):
 
     # Displays Relatedness Data in a Pandastable
     def display_relatedness_data(self):
-        # User Feedback: Alter Cursor because function takes a while
-        self.gui.root.config(cursor="watch")
-        self.gui.root.update()
+        try:
+            # User Feedback: Alter Cursor because function takes a while
+            self.gui.root.config(cursor="watch")
+            self.gui.root.update()
 
-        self.gui.build_data_manager()
-        # Delete Button
-        self.calculate_button.pack_forget()
-        # Create Pandastable
-        global data_manager
-        self.pane.pack(fill=BOTH,expand=1)
-        self.table = pt = Table(self.pane, dataframe=data_manager.getRelatednessStats(),
-                                showtoolbar=False, showstatusbar=True)
-        pt.show()
-        
-        pt.redrawVisible()
+            self.gui.build_data_manager()
 
-        # Return Cursor to normal
-        self.gui.root.config(cursor="")
+            global data_manager
+            if data_manager.df.empty:
+                return
+
+            # Delete Button
+            self.calculate_button.pack_forget()
+
+            # Create Pandastable
+            self.pane.pack(fill=BOTH,expand=1)
+            self.table = pt = Table(self.pane, dataframe=data_manager.getRelatednessStats(),
+                                    showtoolbar=False, showstatusbar=True)
+            pt.show()
+            
+            pt.redrawVisible()
+        except Exception as e:
+            print("Error with the Relatedness Panel: " + e)
+        finally:
+            # Return Cursor to normal
+            self.gui.root.config(cursor="")
 
 class FoundersPanel(tk.Frame):
     def __init__(self, parent, gui):
@@ -424,24 +457,32 @@ class FoundersPanel(tk.Frame):
 
     # Displays Relatedness Data in a Pandastable
     def display_founders_data(self):
-        # User Feedback: Alter Cursor because function takes a while
-        self.gui.root.config(cursor="watch")
-        self.gui.root.update()
+        try:
+            # User Feedback: Alter Cursor because function takes a while
+            self.gui.root.config(cursor="watch")
+            self.gui.root.update()
 
-        self.gui.build_data_manager()
-        # Delete Button
-        self.calculate_button.pack_forget()
-        # Create Pandastable
-        global data_manager
-        self.pane.pack(fill=BOTH,expand=1)
-        self.table = pt = Table(self.pane, dataframe=data_manager.getFounders(),
-                                showtoolbar=False, showstatusbar=True)
-        pt.show()
+            self.gui.build_data_manager()
+
+            global data_manager
+            if data_manager.df.empty:
+                return
         
-        pt.redrawVisible()
+            # Delete Button
+            self.calculate_button.pack_forget()
 
-        # Return Cursor to normal
-        self.gui.root.config(cursor="")
+            # Create Pandastable
+            self.pane.pack(fill=BOTH,expand=1)
+            self.table = pt = Table(self.pane, dataframe=data_manager.getFounders(),
+                                    showtoolbar=False, showstatusbar=True)
+            pt.show()
+            
+            pt.redrawVisible()
+        except Exception as e:
+            print("Error with the Relatedness Panel: " + e)
+        finally:
+            # Return Cursor to normal
+            self.gui.root.config(cursor="")
 
 class LineagePanel(tk.Frame):
     def __init__(self, parent, gui):
@@ -462,24 +503,32 @@ class LineagePanel(tk.Frame):
     
     # Displays Relatedness Data in a Pandastable
     def display_lineage_data(self):
-        # User Feedback: Alter Cursor because function takes a while
-        self.gui.root.config(cursor="watch")
-        self.gui.root.update()
+        try:
+            # User Feedback: Alter Cursor because function takes a while
+            self.gui.root.config(cursor="watch")
+            self.gui.root.update()
 
-        self.gui.build_data_manager()
-        # Delete Button
-        self.calculate_button.pack_forget()
-        # Create Pandastable
-        global data_manager
-        self.pane.pack(fill=BOTH,expand=1)
-        self.table = pt = Table(self.pane, dataframe=data_manager.getLineages(),
-                                showtoolbar=False, showstatusbar=True)
-        pt.show()
-        
-        pt.redrawVisible()
+            self.gui.build_data_manager()
 
-        # Return Cursor to normal
-        self.gui.root.config(cursor="")
+            global data_manager
+            if data_manager.df.empty:
+                return
+            
+            # Delete Button
+            self.calculate_button.pack_forget()
+
+            # Create Pandastable
+            self.pane.pack(fill=BOTH,expand=1)
+            self.table = pt = Table(self.pane, dataframe=data_manager.getLineages(),
+                                    showtoolbar=False, showstatusbar=True)
+            pt.show()
+            
+            pt.redrawVisible()
+        except Exception as e:
+            print("Error with the Lineages Panel: " + e)
+        finally:
+            # Return Cursor to normal
+            self.gui.root.config(cursor="")
 
 class KinCounterPanel(tk.Frame):
     def __init__(self, parent, gui):
@@ -554,30 +603,35 @@ class KinCounterPanel(tk.Frame):
 
     # Displays Relatedness Data in a Pandastable
     def display_kin_counter_results(self):
-        # User Feedback: Alter Cursor because function takes a while
-        self.gui.root.config(cursor="watch")
-        self.gui.root.update()
+        try:
+            # User Feedback: Alter Cursor because function takes a while
+            self.gui.root.config(cursor="watch")
+            self.gui.root.update()
 
-        self.gui.build_data_manager()
+            self.gui.build_data_manager()
 
-        # Get Selections from Dropdowns
-        values = [self.firstValue.get(),
-                  self.secondValue.get(),
-                  self.thirdValue.get(),
-                  self.fourthValue.get()]
+            global data_manager
+            if data_manager.df.empty:
+                return
 
-        # Create Pandastable
-        global data_manager
-        self.data_pane.pack(fill=BOTH,expand=1)
-        self.table = pt = Table(self.data_pane, dataframe=data_manager.getKinCounts(values),
-                                showtoolbar=False, showstatusbar=True)
-        pt.show()
-        
-        pt.redrawVisible()
+            # Get Selections from Dropdowns
+            values = [self.firstValue.get(),
+                    self.secondValue.get(),
+                    self.thirdValue.get(),
+                    self.fourthValue.get()]
 
-        # Return Cursor to normal
-        self.gui.root.config(cursor="")
-        pass
+            # Create Pandastable
+            self.data_pane.pack(fill=BOTH,expand=1)
+            self.table = pt = Table(self.data_pane, dataframe=data_manager.getKinCounts(values),
+                                    showtoolbar=False, showstatusbar=True)
+            pt.show()
+            
+            pt.redrawVisible()
+        except Exception as e:
+            print("Error with the Relatedness Panel: " + e)
+        finally:
+            # Return Cursor to normal
+            self.gui.root.config(cursor="")
 
 class KinPanel(tk.Frame):
     def __init__(self, parent):
