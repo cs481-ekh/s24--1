@@ -3,7 +3,7 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 
 import tkinter as tk
 from tkinter import *
-from tkinter import filedialog, ttk, messagebox
+from tkinter import filedialog, ttk, messagebox, scrolledtext
 from tkhtmlview import HTMLLabel
 import pandas as pd
 from pandastable import Table, TableModel # Excellent Documentation: https://pandastable.readthedocs.io/en/latest/pandastable.html
@@ -180,6 +180,7 @@ class EditorPanel(tk.Frame):
 
         self.firstRow = None
         self.removeHeader = BooleanVar()
+        self.includeIncest = BooleanVar()
 
         # Create widgets
         self.create_panel_layout()
@@ -200,6 +201,8 @@ class EditorPanel(tk.Frame):
         self.data_pane.pack(side = "left")
         self.error_pane = tk.Frame(self.upper, highlightbackground='Black', highlightthickness=2, height=height, width=width * 0.3)
         self.error_pane.pack(side = "right")
+        self.errordisplay = scrolledtext.ScrolledText(self.error_pane) # Initialized here to prevent duplication
+        self.errordisplay.pack()
         self.selection_pane = tk.Frame(self, highlightbackground='Black', highlightthickness=2, height=height * 0.3, width=width)
         self.selection_pane.pack(side = "bottom", fill=BOTH)
 
@@ -216,7 +219,7 @@ class EditorPanel(tk.Frame):
         containsHeading.grid(row=0, column=0, columnspan=4)
 
         # Check for Incest Checkbox
-        incest = Checkbutton(self.selection_pane, text="Incest")
+        incest = Checkbutton(self.selection_pane, text="Incest", variable=self.includeIncest)
         incest.grid(row=0, column=10)
 
         # Ego Dropdown Menu
@@ -315,20 +318,24 @@ class EditorPanel(tk.Frame):
                                 command = self.load_errors)
         checkErrorButton.grid(row=0, column=6, columnspan=3)
 
-    # TODO: Causes Error because the Datamanager Dataframe does not yet exist
-    # TODO: Ensure errors allow for incest checking
     # Displays all errors from DataManager
     def load_errors(self):
-        v = Scrollbar(self.error_pane, orient='vertical')
-        v.pack(side='right', fill='y')
+        # Ensure DataManager is built properly
+        self.gui.build_data_manager()
 
-        text = Text(self.error_pane, yscrollcommand=v.set)
+        # Removes old errors from previous button press
+        self.errordisplay.delete('1.0', END)
 
+        # Gets errors and displays them
+        global data_manager
+        errors = data_manager.checkForErrors(self.includeIncest.get())
+        if len(errors) == 0:
+            errors.append("No errors found!")
         for e in errors:
-            text.insert(END, e + "\n\n")
+            self.errordisplay.insert(tk.INSERT, e + "\n")
 
-        text.pack()
-        pass
+        # Blocks user from editing errors box
+        self.errordisplay.configure(state ='disabled')
 
     # Gets called with Checkbox (First row contains Header)
     # Updates pandastable dataframe; deletes/adds first row, updates column names
