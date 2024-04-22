@@ -72,7 +72,7 @@ class GUI:
         self.notebook.insert(1, RelatednessPanel(self.notebook, self), text="Relatedness")
         self.notebook.insert(2, FoundersPanel(self.notebook, self), text="Founders")
         self.notebook.insert(3, LineagePanel(self.notebook, self), text="Lineages")
-        self.notebook.insert(4, KinGroupPanel(self.notebook), text="Kin Counter")
+        self.notebook.insert(4, KinCounterPanel(self.notebook, self), text="Kin Counter")
         self.notebook.insert(5, KinPanel(self.notebook), text="Kin")
         self.notebook.insert(6, GroupPanel(self.notebook), text="Groups")
         self.notebook.insert(7, PlotPanel(self.notebook), text="Plot")
@@ -127,15 +127,15 @@ class GUI:
         editor = self.editor_panel
 
         # Build Parameters for DataManager DataFrame Creation
-        columns = [editor.egoColumnValue.get(),\
-                   editor.fatherColumnValue.get(),\
-                   editor.motherColumnValue.get(),\
-                   editor.sexColumnValue.get(),\
+        columns = [editor.egoColumnValue.get(),
+                   editor.fatherColumnValue.get(),
+                   editor.motherColumnValue.get(),
+                   editor.sexColumnValue.get(),
                    editor.livingColumnValue.get()]
-        values = [editor.maleValue.get(),\
-                  editor.femaleValue.get(),\
-                  editor.aliveValue.get(),\
-                  editor.deadValue.get(),\
+        values = [editor.maleValue.get(),
+                  editor.femaleValue.get(),
+                  editor.aliveValue.get(),
+                  editor.deadValue.get(),
                   editor.missingValue.get()]
         headerCheckbox = editor.removeHeader.get()
 
@@ -481,16 +481,103 @@ class LineagePanel(tk.Frame):
         # Return Cursor to normal
         self.gui.root.config(cursor="")
 
-class KinGroupPanel(tk.Frame):
-    def __init__(self, parent):
+class KinCounterPanel(tk.Frame):
+    def __init__(self, parent, gui):
         super().__init__(parent)
         self.parent = parent
+        self.gui = gui
 
-        self.temp = tk.Frame(self, highlightbackground='Black', highlightthickness=2)
-        self.temp.pack(side = "bottom")
+        self.create_panel_layout()
+    
+    # Creates two Frames (Data and Selection)
+    # Fills out Selection Frame with 4 dropdowns with options and run button
+    def create_panel_layout(self):
+        self.data_pane = tk.Frame(self, highlightbackground='Black', highlightthickness=2)
+        self.data_pane.pack(side = "left")
+        self.selection_pane = tk.Frame(self, highlightbackground='Black', highlightthickness=2, height=height, width=width * 0.3)
+        self.selection_pane.pack(side = "right")
 
-        label = Label(self.temp, text="In Development")
-        label.pack()
+        # TODO: Possibly swap to technical shorthand
+        selectionOptions = ['',
+                            'fathers',
+                            'mothers',
+                            'parents',
+                            'sons',
+                            'daughters',
+                            'offspring',
+                            'full brothers',
+                            'full sisters',
+                            'full siblings',
+                            'grandparents',
+                            'grandchildren',
+                            'halfbrothers',
+                            'halfsisters',
+                            'halfsiblings',
+                            'full cousins',
+                            'mates',
+                            'stepsons',
+                            'stepdaughters',
+                            'stepchildren',
+                            'stepbrothers',
+                            'stepsisters',
+                            'stepsiblings']
+
+        # First Dropdown Menu
+        self.firstValue = tk.StringVar()
+        self.firstDropdown = ttk.Combobox(self.selection_pane, width = 10, textvariable = self.firstValue)
+        self.firstDropdown['values'] = selectionOptions
+        self.firstDropdown.grid(row=0, column=0)
+
+        # Second Dropdown Menu
+        self.secondValue = tk.StringVar()
+        self.secondDropdown = ttk.Combobox(self.selection_pane, width = 10, textvariable = self.secondValue)
+        self.secondDropdown['values'] = selectionOptions
+        self.secondDropdown.grid(row=1, column=0)
+
+        # Third Dropdown Menu
+        self.thirdValue = tk.StringVar()
+        self.thirdDropdown = ttk.Combobox(self.selection_pane, width = 10, textvariable = self.thirdValue)
+        self.thirdDropdown['values'] = selectionOptions
+        self.thirdDropdown.grid(row=2, column=0)
+
+        # Fourth Dropdown Menu
+        self.fourthValue = tk.StringVar()
+        self.fourthDropdown = ttk.Combobox(self.selection_pane, width = 10, textvariable = self.fourthValue)
+        self.fourthDropdown['values'] = selectionOptions
+        self.fourthDropdown.grid(row=3, column=0)
+
+        # Run Button
+        runButton = tk.Button(self.selection_pane, 
+                                text = "Run",  
+                                command = self.display_kin_counter_results)
+        runButton.grid(row=4, column=0, columnspan=3)
+
+    # Displays Relatedness Data in a Pandastable
+    def display_kin_counter_results(self):
+        # User Feedback: Alter Cursor because function takes a while
+        self.gui.root.config(cursor="watch")
+        self.gui.root.update()
+
+        self.gui.build_data_manager()
+
+        # Get Selections from Dropdowns
+        values = [self.firstValue.get(),
+                  self.secondValue.get(),
+                  self.thirdValue.get(),
+                  self.fourthValue.get()]
+
+        # Create Pandastable
+        global data_manager
+        self.data_pane.pack(fill=BOTH,expand=1)
+        self.table = pt = Table(self.data_pane, dataframe=data_manager.getKinCounts(values),
+                                showtoolbar=False, showstatusbar=True)
+        pt.show()
+        
+        pt.redrawVisible()
+
+        # Return Cursor to normal
+        self.gui.root.config(cursor="")
+        pass
 
 class KinPanel(tk.Frame):
     def __init__(self, parent):
