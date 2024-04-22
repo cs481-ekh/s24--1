@@ -81,7 +81,7 @@ class DataManager:
     
     # Validates DataFrame Logic
     # TODO: Create Incest Warnings
-    def checkForErrors(self):
+    def checkForErrors(self, includeIncest=False):
         # Initialize a list to store error messages
         error_messages = []
 
@@ -123,11 +123,12 @@ class DataManager:
             for ego in errors_invalid_sex_egos['Ego']:
                 error_messages.append(f"Error for Ego {ego}: Living colunm is an unexpected value.")
 
+        if includeIncest:
+            print("Includes Incest is Checked")
+            # TODO: Build Incest Errors
+            pass
 
-        # Add additional checks and error messages as needed.
-                
-        for line in error_messages:
-            print(line)
+        # TODO: Add additional checks and error messages as needed.
 
         # Return all error messages
         return error_messages
@@ -203,7 +204,14 @@ class DataManager:
 
     #endregion
         
-    # TODO: Kin Counter Here
+    #region ========= Kin Counter =========
+
+    # Returns a DataFrame with the count of kin that share the specified relationship with each ego
+    # Options is an array of 4 strings from the following (duplicates allowed): '', 'fathers', 'mothers', 'parents', 'sons', 'daughters', 'offspring', 'full brothers', 'full sisters', 'full siblings', 'grandparents', 'grandchildren', 'halfbrothers', 'halfsisters', 'halfsiblings', 'full cousins', 'mates', 'stepsons', 'stepdaughters', 'stepchildren', 'stepbrothers', 'stepsisters', 'stepsiblings'
+    def getKinCounts(self, options):
+        return self.df # TODO: Replace with actual return dataframe
+
+    #endregion
         
     # TODO: Kin Here
         

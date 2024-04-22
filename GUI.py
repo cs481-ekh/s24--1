@@ -3,7 +3,7 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 
 import tkinter as tk
 from tkinter import *
-from tkinter import filedialog, ttk, messagebox
+from tkinter import filedialog, ttk, messagebox, scrolledtext
 from tkhtmlview import HTMLLabel
 import pandas as pd
 from pandastable import Table, TableModel # Excellent Documentation: https://pandastable.readthedocs.io/en/latest/pandastable.html
@@ -70,9 +70,9 @@ class GUI:
         self.editor_panel = EditorPanel(self.notebook, self)
         self.notebook.insert(0, self.editor_panel, text="Editor")
         self.notebook.insert(1, RelatednessPanel(self.notebook, self), text="Relatedness")
-        self.notebook.insert(2, FoundersPanel(self.notebook), text="Founders")
+        self.notebook.insert(2, FoundersPanel(self.notebook, self), text="Founders")
         self.notebook.insert(3, LineagePanel(self.notebook, self), text="Lineages")
-        self.notebook.insert(4, KinGroupPanel(self.notebook), text="Kin Counter")
+        self.notebook.insert(4, KinCounterPanel(self.notebook, self), text="Kin Counter")
         self.notebook.insert(5, KinPanel(self.notebook), text="Kin")
         self.notebook.insert(6, GroupPanel(self.notebook), text="Groups")
         self.notebook.insert(7, PlotPanel(self.notebook), text="Plot")
@@ -115,15 +115,15 @@ class GUI:
 
             # Build Parameters for DataManager DataFrame Creation
             columns = [editor.egoColumnValue.get(),
-                    editor.fatherColumnValue.get(),
-                    editor.motherColumnValue.get(),
-                    editor.sexColumnValue.get(),
-                    editor.livingColumnValue.get()]
+                       editor.fatherColumnValue.get(),
+                       editor.motherColumnValue.get(),
+                       editor.sexColumnValue.get(),
+                       editor.livingColumnValue.get()]
             values = [editor.maleValue.get(),
-                    editor.femaleValue.get(),
-                    editor.aliveValue.get(),
-                    editor.deadValue.get(),
-                    editor.missingValue.get()]
+                      editor.femaleValue.get(),
+                      editor.aliveValue.get(),
+                      editor.deadValue.get(),
+                      editor.missingValue.get()]
             headerCheckbox = editor.removeHeader.get()
 
             # Input Validation
@@ -177,6 +177,7 @@ class EditorPanel(tk.Frame):
 
         self.firstRow = None
         self.removeHeader = BooleanVar()
+        self.includeIncest = BooleanVar()
 
         # Create widgets
         self.create_panel_layout()
@@ -197,6 +198,8 @@ class EditorPanel(tk.Frame):
         self.data_pane.pack(side = "left")
         self.error_pane = tk.Frame(self.upper, height=height, width=width * 0.3)
         self.error_pane.pack(side = "right")
+        self.errordisplay = scrolledtext.ScrolledText(self.error_pane, width=20) # Initialized here to prevent duplication
+        self.errordisplay.pack()
         self.selection_pane = tk.Frame(self, height=height * 0.3, width=width)
         self.selection_pane.pack(side = "bottom", fill=BOTH)
 
@@ -219,7 +222,7 @@ class EditorPanel(tk.Frame):
         checkErrorButton.grid(row=0, column=8, columnspan=2)
 
         # Error Check includes Incest Checkbox
-        incest = Checkbutton(self.selection_pane, text="Incest")
+        incest = Checkbutton(self.selection_pane, text="Incest", variable=self.includeIncest)
         incest.grid(row=0, column=11)
 
         # Ego Dropdown Menu
@@ -312,20 +315,38 @@ class EditorPanel(tk.Frame):
         self.missingValue.grid(row=1, column=11)
         self.missingValue.insert(0, "9999") # Default Value
 
-    # TODO: Causes Error because the Datamanager Dataframe does not yet exist
-    # TODO: Ensure errors allow for incest checking
     # Displays all errors from DataManager
     def load_errors(self):
-        v = Scrollbar(self.error_pane, orient='vertical')
-        v.pack(side='right', fill='y')
+        try:
+            # User Feedback: Alter Cursor because function takes a while
+            self.gui.root.config(cursor="watch")
+            self.gui.root.update()
 
-        text = Text(self.error_pane, yscrollcommand=v.set)
+            # Ensure DataManager is built properly
+            self.gui.build_data_manager()
 
-        for e in errors:
-            text.insert(END, e + "\n\n")
+            global data_manager
+            if data_manager.df.empty:
+                return
 
-        text.pack()
-        pass
+            # Removes old errors from previous button press
+            self.errordisplay.delete('1.0', END)
+
+            # Gets errors and displays them
+            errors = data_manager.checkForErrors(self.includeIncest.get())
+            if len(errors) == 0:
+                errors.append("No errors found!")
+            for e in errors:
+                self.errordisplay.insert(tk.INSERT, e + "\n")
+
+            # Blocks user from editing errors box
+            self.errordisplay.configure(state ='disabled')
+
+        except Exception as e:
+            print("Error with the Editor Panel: " + e)
+        finally:
+            # Return Cursor to normal
+            self.gui.root.config(cursor="")
 
     # Gets called with Checkbox (First row contains Header)
     # Updates pandastable dataframe; deletes/adds first row, updates column names
@@ -403,6 +424,7 @@ class RelatednessPanel(tk.Frame):
 
             # Delete Button
             self.calculate_button.pack_forget()
+
             # Create Pandastable
             self.pane.pack(fill=BOTH,expand=1)
             self.table = pt = Table(self.pane, dataframe=data_manager.getRelatednessStats(),
@@ -417,15 +439,50 @@ class RelatednessPanel(tk.Frame):
             self.gui.root.config(cursor="")
 
 class FoundersPanel(tk.Frame):
-    def __init__(self, parent):
+    def __init__(self, parent, gui):
         super().__init__(parent)
         self.parent = parent
+        self.gui = gui
 
-        self.temp = tk.Frame(self, highlightbackground='Black', highlightthickness=2)
-        self.temp.pack(side = "bottom")
+        self.create_panel_layout()
+    
+    # Sizes the Frame and adds a button
+    def create_panel_layout(self):
+        self.pane = tk.Frame(self, highlightbackground='Black', highlightthickness=2)
+        self.pane.pack(fill=BOTH, expand=True)
 
-        label = Label(self.temp, text="In Development")
-        label.pack()
+        # Create Button
+        self.calculate_button = Button(self.pane, text="Calculate Founders", command=self.display_founders_data)
+        self.calculate_button.pack(side="bottom")
+
+    # Displays Relatedness Data in a Pandastable
+    def display_founders_data(self):
+        try:
+            # User Feedback: Alter Cursor because function takes a while
+            self.gui.root.config(cursor="watch")
+            self.gui.root.update()
+
+            self.gui.build_data_manager()
+
+            global data_manager
+            if data_manager.df.empty:
+                return
+        
+            # Delete Button
+            self.calculate_button.pack_forget()
+
+            # Create Pandastable
+            self.pane.pack(fill=BOTH,expand=1)
+            self.table = pt = Table(self.pane, dataframe=data_manager.getFounders(),
+                                    showtoolbar=False, showstatusbar=True)
+            pt.show()
+            
+            pt.redrawVisible()
+        except Exception as e:
+            print("Error with the Relatedness Panel: " + e)
+        finally:
+            # Return Cursor to normal
+            self.gui.root.config(cursor="")
 
 class LineagePanel(tk.Frame):
     def __init__(self, parent, gui):
@@ -459,6 +516,7 @@ class LineagePanel(tk.Frame):
             
             # Delete Button
             self.calculate_button.pack_forget()
+
             # Create Pandastable
             self.pane.pack(fill=BOTH,expand=1)
             self.table = pt = Table(self.pane, dataframe=data_manager.getLineages(),
@@ -472,16 +530,108 @@ class LineagePanel(tk.Frame):
             # Return Cursor to normal
             self.gui.root.config(cursor="")
 
-class KinGroupPanel(tk.Frame):
-    def __init__(self, parent):
+class KinCounterPanel(tk.Frame):
+    def __init__(self, parent, gui):
         super().__init__(parent)
         self.parent = parent
+        self.gui = gui
 
-        self.temp = tk.Frame(self, highlightbackground='Black', highlightthickness=2)
-        self.temp.pack(side = "bottom")
+        self.create_panel_layout()
+    
+    # Creates two Frames (Data and Selection)
+    # Fills out Selection Frame with 4 dropdowns with options and run button
+    def create_panel_layout(self):
+        self.data_pane = tk.Frame(self, highlightbackground='Black', highlightthickness=2)
+        self.data_pane.pack(side = "left")
+        self.selection_pane = tk.Frame(self, highlightbackground='Black', highlightthickness=2, height=height, width=width * 0.3)
+        self.selection_pane.pack(side = "right")
 
-        label = Label(self.temp, text="In Development")
-        label.pack()
+        # TODO: Possibly swap to technical shorthand
+        selectionOptions = ['',
+                            'fathers',
+                            'mothers',
+                            'parents',
+                            'sons',
+                            'daughters',
+                            'offspring',
+                            'full brothers',
+                            'full sisters',
+                            'full siblings',
+                            'grandparents',
+                            'grandchildren',
+                            'halfbrothers',
+                            'halfsisters',
+                            'halfsiblings',
+                            'full cousins',
+                            'mates',
+                            'stepsons',
+                            'stepdaughters',
+                            'stepchildren',
+                            'stepbrothers',
+                            'stepsisters',
+                            'stepsiblings']
+
+        # First Dropdown Menu
+        self.firstValue = tk.StringVar()
+        self.firstDropdown = ttk.Combobox(self.selection_pane, width = 10, textvariable = self.firstValue)
+        self.firstDropdown['values'] = selectionOptions
+        self.firstDropdown.grid(row=0, column=0)
+
+        # Second Dropdown Menu
+        self.secondValue = tk.StringVar()
+        self.secondDropdown = ttk.Combobox(self.selection_pane, width = 10, textvariable = self.secondValue)
+        self.secondDropdown['values'] = selectionOptions
+        self.secondDropdown.grid(row=1, column=0)
+
+        # Third Dropdown Menu
+        self.thirdValue = tk.StringVar()
+        self.thirdDropdown = ttk.Combobox(self.selection_pane, width = 10, textvariable = self.thirdValue)
+        self.thirdDropdown['values'] = selectionOptions
+        self.thirdDropdown.grid(row=2, column=0)
+
+        # Fourth Dropdown Menu
+        self.fourthValue = tk.StringVar()
+        self.fourthDropdown = ttk.Combobox(self.selection_pane, width = 10, textvariable = self.fourthValue)
+        self.fourthDropdown['values'] = selectionOptions
+        self.fourthDropdown.grid(row=3, column=0)
+
+        # Run Button
+        runButton = tk.Button(self.selection_pane, 
+                                text = "Run",  
+                                command = self.display_kin_counter_results)
+        runButton.grid(row=4, column=0, columnspan=3)
+
+    # Displays Relatedness Data in a Pandastable
+    def display_kin_counter_results(self):
+        try:
+            # User Feedback: Alter Cursor because function takes a while
+            self.gui.root.config(cursor="watch")
+            self.gui.root.update()
+
+            self.gui.build_data_manager()
+
+            global data_manager
+            if data_manager.df.empty:
+                return
+
+            # Get Selections from Dropdowns
+            values = [self.firstValue.get(),
+                    self.secondValue.get(),
+                    self.thirdValue.get(),
+                    self.fourthValue.get()]
+
+            # Create Pandastable
+            self.data_pane.pack(fill=BOTH,expand=1)
+            self.table = pt = Table(self.data_pane, dataframe=data_manager.getKinCounts(values),
+                                    showtoolbar=False, showstatusbar=True)
+            pt.show()
+            
+            pt.redrawVisible()
+        except Exception as e:
+            print("Error with the Relatedness Panel: " + e)
+        finally:
+            # Return Cursor to normal
+            self.gui.root.config(cursor="")
 
 class KinPanel(tk.Frame):
     def __init__(self, parent):
