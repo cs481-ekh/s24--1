@@ -9,7 +9,7 @@ def sample_data_manager():
     # Create a sample DataManager instance with a CSV file
     sample_file = 'Assets/TestData/HomemadeTestSet.csv'
     data_manager = DataManager.DataManager(sample_file)
-    data_manager.createPandasDataFrame(columns=['ID', 'FatherID', 'MotherID', 'Sex', 'Living'], \
+    data_manager.generateBackendData(columns=['ID', 'FatherID', 'MotherID', 'Sex', 'Living'], \
                                        values=['M', 'F', 'Y', 'N', ''], \
                                        removeHeader=True)
     return data_manager
@@ -21,7 +21,7 @@ def valid_data_manager():
     # Create a sample DataManager instance with a CSV file
     sample_file = 'Assets/TestData/ValidTestData.csv'
     data_manager = DataManager.DataManager(sample_file)
-    data_manager.createPandasDataFrame(columns=['ID', 'FatherID', 'MotherID', 'Sex', 'Living'], \
+    data_manager.generateBackendData(columns=['ID', 'FatherID', 'MotherID', 'Sex', 'Living'], \
                                        values=['M', 'F', 'Y', 'N', ''], \
                                        removeHeader=True)
     if len(data_manager.checkForErrors()) == 0:

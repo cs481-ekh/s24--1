@@ -46,11 +46,9 @@ def cli_init(str_list):
                 if os.path.isfile(input_filename):
                     global dataMan
                     dataMan = DataManager(input_filename)
-                    dataMan.createPandasDataFrame(columns=['ID', 'FatherID', 'MotherID', 'Sex', 'Living'], \
+                    dataMan.generateBackendData(columns=['ID', 'FatherID', 'MotherID', 'Sex', 'Living'], \
                                                   values=['Male', 'Female', 'FALSE', 'TRUE', '9999'], \
                                                   removeHeader=True)
-                    if len(dataMan.checkForErrors()) == 0:
-                        dataMan.createNxGraph()
 
                     # Example Uses
                     #print(dataMan.getFounders())

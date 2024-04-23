@@ -135,7 +135,7 @@ class GUI:
                 return
 
             # Call createPandasDataFrame()        
-            return data_manager.createPandasDataFrame(columns, values, headerCheckbox)
+            return data_manager.generateBackendData(columns, values, headerCheckbox)
         except Exception as e:
             print("There was a problem building the data_manager: " + e)
         
