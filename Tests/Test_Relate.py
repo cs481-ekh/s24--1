@@ -53,6 +53,8 @@ def test_cousin_relatedness(valid_data_manager):
 
 #region ReturnValues
 
-
+def test_relatedness_stats(valid_data_manager):
+    stats = valid_data_manager.getRelatednessStats()
+    assert len(stats) == len(valid_data_manager.df)
 
 #endregion

@@ -144,7 +144,14 @@ class DataManager:
     # TODO: Returns Dataframe for Relatedness Tab
     # Columns Include: Ego, FgALL, FgCON, Number of Relatives, Inbreeding
     def getRelatednessStats(self):
-        return self.df
+        df = pd.DataFrame(index=self.df['Ego'], columns=['FgAll', 'FgCon','Number of Relatives','Inbreeding'])
+        rMatrix = self.calculateRMatrix()
+
+        df['FgAll'] = rMatrix.mean()
+        df['FgCon'] = rMatrix.sum() / rMatrix.astype(bool).sum(axis=0)
+        df['Number of Relatives'] = rMatrix.astype(bool).sum(axis=0)
+
+        return df
 
     #endregion
 
