@@ -8,10 +8,8 @@ import os
 
 def print_usage():
     return "Descent is a genealogical analysis program that takes in files \nin the format of .csv and presents genealogical output."
-    return "Descent is a genealogical analysis program that takes in files \nin the format of .csv and presents genealogical output."
 
 def print_details():
-    return print_usage() + "\nTODO: The list of options for each flag would be listed here."
     return print_usage() + "\nTODO: The list of options for each flag would be listed here."
 
 def select_calc_option(str):
@@ -54,11 +52,10 @@ def cli_init(str_list):
                     if len(dataMan.checkForErrors()) == 0:
                         dataMan.createNxGraph()
 
-                    dataMan.calculateRMatrix().to_csv("test.csv")
-
                     # Example Uses
                     #print(dataMan.getFounders())
                     #print(dataMan.getLineages())
+                    #dataMan.calculateRMatrix().to_csv("test.csv")
                 else:
                     retVal += f"{input_filename} could not be found and was not opened.\n"
 

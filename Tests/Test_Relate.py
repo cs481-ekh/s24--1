@@ -50,3 +50,15 @@ def test_cousin_relatedness(valid_data_manager):
     assert valid_data_manager.calculateRelatedness(14, 15) == 0.0625
 
 #endregion
+
+#region ReturnValues
+
+def test_relatedness_stats(valid_data_manager):
+    stats = valid_data_manager.getRelatednessStats()
+    assert len(stats) == len(valid_data_manager.df)
+    assert stats.loc[12]['FgCon'] == 1.0
+    assert stats.loc[11]['FgAll'] == 0.1
+    assert stats.loc[12]['Number of Relatives'] == 1
+    assert stats.loc[2]['FgAll'] == 0.325
+
+#endregion
