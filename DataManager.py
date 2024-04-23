@@ -241,11 +241,16 @@ class DataManager:
         try:
             r_matrix = pd.DataFrame(index=self.df['Ego'], columns=self.df['Ego'])
 
-            for i in self.df['Ego']:
-                for j in self.df['Ego']:
+            sorted_egos = self.df['Ego'].sort_values(ascending=True, ignore_index=True)
+
+            for i in sorted_egos:
+                for j in sorted_egos:
+                    if j < i : continue
                     # Calculate relatedness between individuals i and j
                     relatedness = self.calculateRelatedness(i, j)
                     r_matrix.loc[i, j] = relatedness
+                    r_matrix.loc[j, i] = relatedness
+
 
             return r_matrix
         except Exception as e:
