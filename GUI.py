@@ -130,7 +130,7 @@ class GUI:
             if '' in columns:
                 messagebox.showerror("Invalid Input", "At least one of the Colunms is not selected in the Editor")
                 return
-            if '' in values:
+            if '' in values and '' not in values[4]:
                 messagebox.showerror("Invalid Input", "At least one of the Expected Values is blank in the Editor")
                 return
 
