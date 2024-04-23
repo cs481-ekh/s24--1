@@ -36,7 +36,7 @@ class DataManager:
             # Column Names from input file to select (Order Matters; Ego, Father, Mother, Sex, Living)
             # Expected Values from input file (Order Matters; Male, Female, Living, Dead, Missing Value)
             # Remove Header (First row is column names)
-    def createPandasDataFrame(self, columns=['Ego', 'Father', 'Mother', 'Sex', 'Living'], values=['M', 'F', 'Y', 'N', ''], removeHeader=True):
+    def generateBackendData(self, columns=['Ego', 'Father', 'Mother', 'Sex', 'Living'], values=['M', 'F', 'Y', 'N', ''], removeHeader=True):
         if self.data is None:
             print("You can't create the DataFrame: Data is None")
             return
@@ -68,14 +68,15 @@ class DataManager:
                                           columns[3]: 'Sex', \
                                           columns[4]: 'Living' })
 
-        # TODO: Possible Solutions to Error in RMatrix (Ego, Father, Mother must be same Type!)
-
         self.df['Ego'] = pd.to_numeric(self.df['Ego'], errors='coerce', downcast='integer')
         self.df['Father'] = pd.to_numeric(self.df['Father'], errors='coerce', downcast='integer')
         self.df['Mother'] = pd.to_numeric(self.df['Mother'], errors='coerce', downcast='integer')
         
         self.df['Sex'] = self.df['Sex'].astype(str)
         self.df['Living'] = self.df['Living'].astype(str)
+
+        if len(self.checkForErrors()) == 0:
+            self.createNxGraph()
 
         return self.df
     
@@ -257,7 +258,7 @@ class DataManager:
     def calculateRelatedness(self, i, j):
         if i == j:
             return 1
-        if i not in self.graph or j not in self.graph:
+        if i not in self.graph.nodes or j not in self.graph.nodes:
             return 0
         parent = list(nx.all_pairs_lowest_common_ancestor(self.graph, [(i, j)]))
         if len(parent) != 1:

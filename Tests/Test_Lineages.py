@@ -8,7 +8,7 @@ def ziker_data_manager():
     # Create a sample DataManager instance with a CSV file
     sample_file = 'Assets/TestData/ZikerInputFile.csv'
     data_manager = DataManager.DataManager(sample_file)
-    data_manager.createPandasDataFrame(columns=['PersonID', 'FatherID', 'MotherID', 'Sex', 'Deceased'], \
+    data_manager.generateBackendData(columns=['PersonID', 'FatherID', 'MotherID', 'Sex', 'Deceased'], \
                                                 values=['Male', 'Female', 'FALSE', 'TRUE', '9999'], \
                                                 removeHeader=True)
     return data_manager
