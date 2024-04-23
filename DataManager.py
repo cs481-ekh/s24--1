@@ -1,11 +1,16 @@
 import pandas as pd # Excellent Documentation: https://pandas.pydata.org/docs/reference/frame.html
 import numpy as np
 import networkx as nx
+from multiprocessing import Process
+
+from concurrent.futures import ThreadPoolExecutor
+import threading
 
 # Math Files
 import Founders
 import Lineages
 
+lock = threading.Lock()
 
 class DataManager:
     # Initializes DataManager using Input File Name (../Example.csv)
@@ -14,7 +19,7 @@ class DataManager:
             self.data = []
             self.df = pd.DataFrame() # DataFrame
             self.graph = None # networkx graph
-            self.rm = None # Relate Matrix DataFrame
+            self.r_matrix = None # Relate Matrix DataFrame
             self.founders = None # Founders DataFrame
             self.founderStats = None # Founders Descendant Stats
             self.lineages = None # Lineages DataFrame
@@ -130,6 +135,7 @@ class DataManager:
             pass
 
         # TODO: Add additional checks and error messages as needed.
+            # Ensure Father and Mother Ego's exist
 
         # Return all error messages
         return error_messages
@@ -239,20 +245,40 @@ class DataManager:
     # Calculates the relatedness of each individual to each individual
     def calculateRMatrix(self):
         try:
-            r_matrix = pd.DataFrame(index=self.df['Ego'], columns=self.df['Ego'])
+            self.r_matrix = pd.DataFrame(index=self.df['Ego'], columns=self.df['Ego'])
 
             sorted_egos = self.df['Ego'].sort_values(ascending=True, ignore_index=True)
 
-            for i in sorted_egos:
-                for j in sorted_egos:
-                    if j < i : continue
-                    # Calculate relatedness between individuals i and j
-                    relatedness = self.calculateRelatedness(i, j)
-                    r_matrix.loc[i, j] = relatedness
-                    r_matrix.loc[j, i] = relatedness
+            processList = []
 
+            # for i in sorted_egos:
+            #     for j in sorted_egos:
+            #         if j < i : continue
+            #         # Calculate relatedness between individuals i and j
+            #         p = Process(target=self.calculateRelatedness, args=(i, j))
+            #         processList.append(p)
+            #         p.start()
+            
+            # for p in processList:
+            #     p.join()
 
-            return r_matrix
+            with ThreadPoolExecutor(max_workers=100) as executor:
+                futures = []
+                for i in sorted_egos:
+                    for j in sorted_egos:
+                        if j < i:
+                            continue
+                        futures.append(executor.submit(self.calculateRelatedness, i, j))
+
+                for future in futures:
+                    result = future.result()
+                    if result is not None:
+                        i, j, relatedness = result
+                        with lock:
+                            self.r_matrix.loc[i, j] = relatedness
+                            self.r_matrix.loc[j, i] = relatedness
+
+            return self.r_matrix
         except Exception as e:
             print("Error calculating RMatrix:", e)
             return None
@@ -260,18 +286,18 @@ class DataManager:
     # Recursively Determines two individual's relatedness
     # Takes in Ego i and Ego j of self.df
     # Takes in blank set: visited, to not repeat people
-    def calculateRelatedness(self, i, j):
+    def calculateRelatedness(self, i, j,):
         if i == j:
-            return 1
+            return i, j, 1
         if i not in self.graph.nodes or j not in self.graph.nodes:
-            return 0
+            return i, j, 0
         parent = list(nx.all_pairs_lowest_common_ancestor(self.graph, [(i, j)]))
         if len(parent) != 1:
-            return 0
+            return i, j, 0
         else:
             parent = parent[0][1]
             distance = nx.shortest_path_length(self.graph, parent, i) + nx.shortest_path_length(self.graph, parent, j)
-            return 1 / (2 ** distance)
+            return i, j, 1 / (2 ** distance)
 
     #endregion
 
