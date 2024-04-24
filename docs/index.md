@@ -13,3 +13,16 @@ The "Descent" project introduces a powerful Python-based tool designed to analyz
 ## What We Actually Built:
 
 In this project, we updated the "Descent" program, originally developed in 2005 using Python 2, for contemporary use on a Windows 11 system with Python 3. We were able to get the old version to operate on a Windows XP virtual machine, ensuring the integrity of the original software. We overhauled the outdated graphical user interface, replacing it with a modern GUI framework that enhances user interaction while maintaining the original layout and functionality. We upgraded the program's computational backend by integrating the Pandas data analysis library, which significantly boosts processing speed and efficiency. Most importantly, throughout these updates we were able to preserve the core functionality of "Descent," making alterations only where specifically required. We rigorously tested the updated program to confirm its full compatibility with Windows 11, thus ensuring that it meets current technological standards and user expectations.
+
+## How it works:
+
+The user must first import a file. This is done from the file menu at the top of the window. Then the editor panel is filled out with the data from the selected file. The user must fill out which columns are which using the dropdown menus and the expected values. Once this is completed there are multiple calculation options avialable including check error which is also on the Editor Tab. The user is able to switch to one of the other tabs and run it's calculation simply by pressing the calculate button. For extremely large datasets, some calculations can take extremely long as the computations are O(n^2).
+
+## Snippets from Application:
+
+![Editor Panel](/docs/img/EditorPanel.png)
+![Relatedness Panel](/docs/img/RelatednessPanel.png)
+![Founders Panel](/docs/img/FoundersPanel.png)
+![Lineages Panel](/docs/img/LineagesPanel.png)
+
+* Note all of these snippets are after clicking the calculation buttons
