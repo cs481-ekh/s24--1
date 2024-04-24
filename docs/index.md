@@ -20,9 +20,9 @@ The user must first import a file. This is done from the file menu at the top of
 
 ## Snippets from Application:
 
-![Editor Panel](/docs/img/EditorPanel.png)
-![Relatedness Panel](/docs/img/RelatednessPanel.png)
-![Founders Panel](/docs/img/FoundersPanel.png)
-![Lineages Panel](/docs/img/LineagesPanel.png)
+![Editor Panel](/S24--1/docs/img/EditorPanel.png)
+![Relatedness Panel](/S24--1/docs/img/RelatednessPanel.png)
+![Founders Panel](/S24--1/docs/img/FoundersPanel.png)
+![Lineages Panel](/S24--1/docs/img/LineagesPanel.png)
 
 * Note all of these snippets are after clicking the calculation buttons
